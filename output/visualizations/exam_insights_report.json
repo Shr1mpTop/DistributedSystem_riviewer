@@ -1,0 +1,53 @@
+{
+  "overview": {
+    "total_questions": 120,
+    "total_sources": 8,
+    "question_types": 5,
+    "knowledge_coverage": 0.0
+  },
+  "type_analysis": {
+    "counts": {
+      "Calculation": 57,
+      "Short Answer": 44,
+      "Essay": 8,
+      "Programming": 7,
+      "Fill in Blank": 4
+    },
+    "percentages": {
+      "Calculation": 47.5,
+      "Short Answer": 36.666666666666664,
+      "Essay": 6.666666666666667,
+      "Programming": 5.833333333333333,
+      "Fill in Blank": 3.3333333333333335
+    },
+    "total_types": 5,
+    "most_common": "Calculation",
+    "least_common": "Fill in Blank"
+  },
+  "knowledge_analysis": {
+    "total_unique_points": 32,
+    "top_10_points": {
+      "['Fundamental models']": 31,
+      "['Synchronizing Physical Clocks']": 14,
+      "['Structured DHT Systems']": 11,
+      "['Causal Ordering and Logical Clocks']": 11,
+      "['Global States', 'Distributed Debugging']": 8,
+      "['Sun Network File System', 'Andrew and Coda File Systems']": 5,
+      "['Object-based model: remote method invocation (RMI)', 'An example of Java RMI']": 3,
+      "['Uncategorized']": 3,
+      "['Domain Name System']": 3,
+      "['Global States']": 3
+    },
+    "total_mentions": 120,
+    "coverage_rate": 0.0
+  },
+  "difficulty_analysis": {
+    "avg_title_length": 650.625,
+    "complex_questions": 30
+  },
+  "recommendations": [
+    "重点关注Calculation，占比47.5%",
+    "高频知识点：['Fundamental models'], ['Synchronizing Physical Clocks'], ['Structured DHT Systems']",
+    "题目普遍较长，建议加强理解能力训练"
+  ]
+}

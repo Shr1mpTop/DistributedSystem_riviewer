@@ -3,6 +3,8 @@
 ## 📊 数据可视化展示
 
 ### 章节重要程度分析
+![章节分布](output/visualizations/chapter_distribution_analysis.png)
+
 ![章节重要程度分析](output/visualizations/chapter_importance_analysis.png)
 
 ### 题型分布分析

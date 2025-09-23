@@ -1,0 +1,110 @@
+{
+  "config": {
+    "project_name": "NTU分布式系统考试指南",
+    "version": "1.0.0",
+    "author": "分布式系统考试指南项目组",
+    "created_at": "2025-09-24T02:19:37.843933"
+  },
+  "analysis_date": "2025-09-24T02:32:16.930527",
+  "stages": {
+    "pdf_analysis": "completed",
+    "data_processing": "completed",
+    "visualization": "completed"
+  },
+  "statistics": {
+    "total_questions": 120,
+    "question_types": {
+      "Calculation": 57,
+      "Short Answer": 44,
+      "Essay": 8,
+      "Programming": 7,
+      "Fill in Blank": 4
+    },
+    "sources": {
+      "8.pdf": 20,
+      "7.pdf": 20,
+      "5.pdf": 20,
+      "3.pdf": 20,
+      "2.pdf": 16,
+      "1.pdf": 9,
+      "6.pdf": 8,
+      "4.pdf": 7
+    },
+    "avg_title_length": 650.625,
+    "refers": {
+      "Chapter 7 Time and Global States": 47,
+      "Chapter 1 Characterization of Distributed Systems & System Models": 37,
+      "Chapter 5 Peer-to-Peer File Sharing Systems": 11,
+      "Chapter 3 Distributed Objects & Remote Invocation": 10,
+      "Chapter 4 Distributed File Systems": 9,
+      "Chapter 6 Name Services": 4,
+      "Chapter 2 Interprocess Communication": 2
+    },
+    "knowledge_points_coverage": 0.975
+  },
+  "insights": {
+    "overview": {
+      "total_questions": 120,
+      "total_sources": 8,
+      "question_types": 5,
+      "knowledge_coverage": 0.0
+    },
+    "type_analysis": {
+      "counts": {
+        "Calculation": 57,
+        "Short Answer": 44,
+        "Essay": 8,
+        "Programming": 7,
+        "Fill in Blank": 4
+      },
+      "percentages": {
+        "Calculation": 47.5,
+        "Short Answer": 36.666666666666664,
+        "Essay": 6.666666666666667,
+        "Programming": 5.833333333333333,
+        "Fill in Blank": 3.3333333333333335
+      },
+      "total_types": 5,
+      "most_common": "Calculation",
+      "least_common": "Fill in Blank"
+    },
+    "knowledge_analysis": {
+      "total_unique_points": 32,
+      "top_10_points": {
+        "['Fundamental models']": 31,
+        "['Synchronizing Physical Clocks']": 14,
+        "['Structured DHT Systems']": 11,
+        "['Causal Ordering and Logical Clocks']": 11,
+        "['Global States', 'Distributed Debugging']": 8,
+        "['Sun Network File System', 'Andrew and Coda File Systems']": 5,
+        "['Object-based model: remote method invocation (RMI)', 'An example of Java RMI']": 3,
+        "['Uncategorized']": 3,
+        "['Domain Name System']": 3,
+        "['Global States']": 3
+      },
+      "total_mentions": 120,
+      "coverage_rate": 0.0
+    },
+    "difficulty_analysis": {
+      "avg_title_length": 650.625,
+      "complex_questions": 30
+    },
+    "recommendations": [
+      "重点关注Calculation，占比47.5%",
+      "高频知识点：['Fundamental models'], ['Synchronizing Physical Clocks'], ['Structured DHT Systems']",
+      "题目普遍较长，建议加强理解能力训练"
+    ]
+  },
+  "output_files": [
+    "output/parsed_questions.json",
+    "output/statistics.json",
+    "output/questions_full.csv",
+    "output/questions.csv",
+    "output/visualizations/interactive_dashboard.html",
+    "output/visualizations/question_type_distribution.png",
+    "output/visualizations/exam_insights_report.json",
+    "output/visualizations/chapter_importance_analysis.png",
+    "output/visualizations/knowledge_points_analysis.png",
+    "output/visualizations/chapter_distribution_analysis.png"
+  ]
+}
