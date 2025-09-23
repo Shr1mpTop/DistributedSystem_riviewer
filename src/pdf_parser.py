@@ -61,52 +61,58 @@ class PDFParser:
         self.last_api_call = time.time()
     
     def create_extraction_prompt(self) -> str:
-        """创建用于题目提取的超级严格提示词 - 为了百万年薪！"""
+        """Create extraction prompt in English for better Gemini performance"""
         curriculum_str = json.dumps(self.curriculum, ensure_ascii=False, indent=2)
         
         prompt = f"""
 ## 🎯 CRITICAL INSTRUCTION - MUST FOLLOW EXACTLY 🎯
 
-你是一个顶级的考试题目提取专家。你的任务是从这个PDF文档中提取考试题目，并且必须严格按照指定的JSON格式输出。
+You are a top-tier exam question extraction expert. Your task is to extract exam questions from this PDF document and output them in the specified JSON format strictly.
 
-**⚠️ 重要：你的回复必须是纯JSON格式，不能包含任何其他文字说明！**
+**⚠️ IMPORTANT: Your response must be pure JSON format without any other text explanation!**
 
-### 📚 课程大纲参考（用于匹配知识点）:
+### 📚 Course Curriculum Reference (for knowledge point matching):
 {curriculum_str}
 
-### 🔒 强制输出格式 - 必须严格遵守：
+### 🔒 MANDATORY OUTPUT FORMAT - MUST STRICTLY FOLLOW:
 {{
   "questions": [
     {{
       "id": "Q001",
-      "title": "题目的完整描述，包括所有选项（如果是选择题）",
-      "type": "选择题|填空题|简答题|论述题|计算题|判断题|编程题",
-      "answer": "标准答案或未提供",
-      "refer": "对应的课程章节名称"
+      "title": "Complete question description including all options (if multiple choice)",
+      "type": "Multiple Choice|Fill in Blank|Short Answer|Essay|Calculation|True/False|Programming",
+      "refer": "Corresponding course chapter name",
+      "knowledge_points": ["specific knowledge point 1", "specific knowledge point 2", "specific knowledge point 3"]
     }}
   ]
 }}
 
-### 📋 严格执行规则：
-1. **必须输出有效JSON** - 任何非JSON内容都不被接受
-2. **id格式**: Q001, Q002, Q003... 依次递增
-3. **title**: 包含题目完整内容，选择题要包含所有选项A、B、C、D
-4. **type**: 只能是以下之一：选择题、填空题、简答题、论述题、计算题、判断题、编程题
-5. **answer**: 如果PDF中有答案就写答案，没有就写"未提供"
-6. **refer**: 根据题目内容匹配到课程大纲中的章节，格式如"第1章 分布式系统特征与系统模型"
+### 📋 STRICT EXECUTION RULES:
+1. **MUST output valid JSON** - No non-JSON content is accepted
+2. **id format**: Q001, Q002, Q003... incrementally
+3. **title**: Include complete question content, for multiple choice include all options A, B, C, D
+4. **type**: Must be one of: Multiple Choice, Fill in Blank, Short Answer, Essay, Calculation, True/False, Programming
+5. **refer**: Match to curriculum chapters based on question content, format like "Chapter 1 Characterization of Distributed Systems & System Models"
+6. **knowledge_points**: Must be array format, containing specific knowledge points related to this question, extracted from curriculum content array, include 1-3 most relevant knowledge points
 
-### 🎯 题目识别模式：
-- 寻找序号：1., 2., (1), (2), Q1, Question 1 等
-- 识别问号、选择项、填空线
-- 寻找"答案"、"解答"、"Answer"等关键词
+### 🎯 KNOWLEDGE POINT ANALYSIS RULES:
+- Carefully analyze question content and find matching knowledge points from curriculum content arrays
+- knowledge_points must be array format: ["knowledge point 1", "knowledge point 2", "knowledge point 3"]
+- Prioritize selecting 1-3 most relevant specific knowledge points
+- If no matching knowledge points found, use ["Uncategorized"]
 
-### ⚡ 输出要求：
-- 直接输出JSON，不要包装在```json```代码块中
-- 不要添加任何解释文字
-- 确保JSON格式完全正确，可被程序解析
-- 如果没找到题目，输出：{{"questions": []}}
+### 🎯 QUESTION IDENTIFICATION PATTERNS:
+- Look for numbering: 1., 2., (1), (2), Q1, Question 1, etc.
+- Identify question marks, choice options, fill-in blanks
+- Look for "Answer", "Solution", etc. keywords but DO NOT include answers in output
 
-请仔细分析这个PDF文档并提取所有考试题目："""
+### ⚡ OUTPUT REQUIREMENTS:
+- Output JSON directly, do not wrap in ```json``` code blocks
+- Do not add any explanatory text
+- Ensure JSON format is completely correct and parseable
+- If no questions found, output: {{"questions": []}}
+
+Please carefully analyze this PDF document and extract all exam questions:"""
         return prompt
     
     async def analyze_pdf_with_ai(self, pdf_path: str, pdf_name: str, max_retries: int = 3) -> Dict[str, Any]:
@@ -128,7 +134,7 @@ class PDFParser:
                 # 使用新的Google AI API直接处理PDF
                 response = await asyncio.to_thread(
                     self.client.models.generate_content,
-                    model="gemini-2.5-flash",  # 使用flash版本，更快更便宜
+                    model="gemini-2.5-pro",  
                     contents=[
                         types.Part.from_bytes(
                             data=pdf_bytes,
@@ -186,14 +192,21 @@ class PDFParser:
                 valid_questions = []
                 for i, question in enumerate(result['questions']):
                     if isinstance(question, dict):
-                        # 确保所有必需字段存在
+                        # 确保所有必需字段存在（移除answer字段）
                         fixed_question = {
                             'id': question.get('id', f'Q{i+1:03d}'),
                             'title': str(question.get('title', '')).strip(),
-                            'type': str(question.get('type', '未知题型')).strip(),
-                            'answer': str(question.get('answer', '未提供')).strip(),
-                            'refer': str(question.get('refer', '未分类')).strip()
+                            'type': str(question.get('type', 'Unknown')).strip(),
+                            'refer': str(question.get('refer', 'Uncategorized')).strip(),
+                            'knowledge_points': question.get('knowledge_points', ['Uncategorized'])
                         }
+                        
+                        # 确保knowledge_points是列表格式
+                        if not isinstance(fixed_question['knowledge_points'], list):
+                            if isinstance(fixed_question['knowledge_points'], str):
+                                fixed_question['knowledge_points'] = [fixed_question['knowledge_points']]
+                            else:
+                                fixed_question['knowledge_points'] = ['Uncategorized']
                         
                         # 只保留有效题目（至少有标题）
                         if fixed_question['title']:

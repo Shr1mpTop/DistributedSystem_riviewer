@@ -49,58 +49,66 @@ class DataProcessor:
         return text
     
     def normalize_question_type(self, question_type: str) -> str:
-        """标准化题型名称"""
+        """标准化题型名称 - 支持英文输入"""
         if not isinstance(question_type, str):
-            return "未知题型"
+            return "Unknown"
         
         question_type = question_type.lower().strip()
         
-        # 题型映射字典
+        # 题型映射字典 (English to English for consistency)
         type_mapping = {
-            # 选择题
-            'choice': '选择题',
-            'multiple choice': '选择题',
-            'single choice': '选择题',
-            'mcq': '选择题',
-            '选择': '选择题',
+            # Multiple Choice
+            'multiple choice': 'Multiple Choice',
+            'choice': 'Multiple Choice',
+            'single choice': 'Multiple Choice',
+            'mcq': 'Multiple Choice',
+            '选择': 'Multiple Choice',
+            '选择题': 'Multiple Choice',
             
-            # 填空题
-            'fill': '填空题',
-            'fill in': '填空题',
-            'fill-in': '填空题',
-            'blank': '填空题',
-            '填空': '填空题',
+            # Fill in Blank
+            'fill in blank': 'Fill in Blank',
+            'fill': 'Fill in Blank',
+            'fill in': 'Fill in Blank',
+            'fill-in': 'Fill in Blank',
+            'blank': 'Fill in Blank',
+            '填空': 'Fill in Blank',
+            '填空题': 'Fill in Blank',
             
-            # 简答题
-            'short answer': '简答题',
-            'brief answer': '简答题',
-            '简答': '简答题',
+            # Short Answer
+            'short answer': 'Short Answer',
+            'brief answer': 'Short Answer',
+            '简答': 'Short Answer',
+            '简答题': 'Short Answer',
             
-            # 论述题
-            'essay': '论述题',
-            'discussion': '论述题',
-            'long answer': '论述题',
-            '论述': '论述题',
-            '论证': '论述题',
+            # Essay
+            'essay': 'Essay',
+            'discussion': 'Essay',
+            'long answer': 'Essay',
+            '论述': 'Essay',
+            '论述题': 'Essay',
+            '论证': 'Essay',
             
-            # 计算题
-            'calculation': '计算题',
-            'compute': '计算题',
-            '计算': '计算题',
+            # Calculation
+            'calculation': 'Calculation',
+            'compute': 'Calculation',
+            '计算': 'Calculation',
+            '计算题': 'Calculation',
             
-            # 编程题
-            'programming': '编程题',
-            'coding': '编程题',
-            'code': '编程题',
-            '编程': '编程题',
-            '代码': '编程题',
+            # Programming
+            'programming': 'Programming',
+            'coding': 'Programming',
+            'code': 'Programming',
+            '编程': 'Programming',
+            '编程题': 'Programming',
+            '代码': 'Programming',
             
-            # 判断题
-            'true/false': '判断题',
-            'true false': '判断题',
-            'boolean': '判断题',
-            '判断': '判断题',
-            '对错': '判断题'
+            # True/False
+            'true/false': 'True/False',
+            'true false': 'True/False',
+            'boolean': 'True/False',
+            '判断': 'True/False',
+            '判断题': 'True/False',
+            '对错': 'True/False'
         }
         
         # 查找匹配的题型
@@ -108,7 +116,7 @@ class DataProcessor:
             if key in question_type:
                 return value
         
-        return "其他题型"
+        return "Other"
     
     def extract_knowledge_points(self, refer: str, title: str) -> List[str]:
         """从题目内容中提取知识点"""
@@ -144,41 +152,37 @@ class DataProcessor:
         return list(set(knowledge_points))  # 去重
     
     def process_questions_to_dataframe(self, questions: List[Dict[str, Any]]) -> pd.DataFrame:
-        """将题目数据转换为DataFrame"""
+        """将题目数据转换为DataFrame - 支持新的JSON格式"""
         processed_data = []
         
         for question in questions:
-            # 提取基本信息
+            # 提取基本信息（移除answer字段）
             question_id = question.get('id', '')
             title = self.clean_text(question.get('title', ''))
-            answer = self.clean_text(question.get('answer', '未提供'))
-            refer = question.get('refer', '未提供')
-            source = question.get('source', '未知')
+            refer = question.get('refer', 'Uncategorized')
+            source = question.get('source', 'Unknown')
             
             # 标准化题型
-            original_type = question.get('type', '未知题型')
+            original_type = question.get('type', 'Unknown')
             normalized_type = self.normalize_question_type(original_type)
             
-            # 提取知识点
-            knowledge_points = self.extract_knowledge_points(refer, title)
-            knowledge_points_str = '; '.join(knowledge_points) if knowledge_points else '未识别'
+            # 处理知识点 - 直接使用AI返回的knowledge_points数组
+            knowledge_points_list = question.get('knowledge_points', [])
+            if not isinstance(knowledge_points_list, list):
+                knowledge_points_list = ['Uncategorized']
             
             # 计算题目长度（用于复杂度分析）
             title_length = len(title)
-            answer_length = len(answer) if answer != '未提供' else 0
             
             processed_data.append({
                 'id': question_id,
                 'title': title,
                 'type': normalized_type,
                 'original_type': original_type,
-                'answer': answer,
                 'refer': refer,
-                'knowledge_points': knowledge_points_str,
+                'knowledge_points': knowledge_points_list,  # 只保留数组格式
                 'source': source,
-                'title_length': title_length,
-                'answer_length': answer_length,
-                'has_answer': '是' if answer != '未提供' else '否'
+                'title_length': title_length
             })
         
         df = pd.DataFrame(processed_data)
@@ -186,13 +190,13 @@ class DataProcessor:
         return df
     
     def export_to_csv(self, df: pd.DataFrame, output_path: str = "output/questions.csv"):
-        """导出数据到CSV文件"""
+        """导出数据到CSV文件 - 移除answer字段"""
         try:
             # 确保输出目录存在
             Path(output_path).parent.mkdir(parents=True, exist_ok=True)
             
-            # 导出核心字段到CSV
-            core_columns = ['id', 'title', 'type', 'answer']
+            # 导出核心字段到CSV (移除answer字段)
+            core_columns = ['id', 'title', 'type', 'refer']
             core_df = df[core_columns]
             core_df.to_csv(output_path, index=False, encoding='utf-8-sig')
             
@@ -210,14 +214,21 @@ class DataProcessor:
             return None, None
     
     def generate_summary_statistics(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """生成数据统计摘要"""
+        """生成数据统计摘要 - 移除answer相关统计"""
+        # 计算知识点覆盖率 - 检查非空数组
+        knowledge_points_coverage = 0
+        if not df.empty:
+            valid_kp_count = sum(1 for kp_list in df['knowledge_points'] 
+                               if isinstance(kp_list, list) and kp_list and kp_list != ['Uncategorized'])
+            knowledge_points_coverage = valid_kp_count / len(df)
+        
         stats = {
             'total_questions': len(df),
             'question_types': df['type'].value_counts().to_dict(),
             'sources': df['source'].value_counts().to_dict(),
-            'has_answer_ratio': (df['has_answer'] == '是').sum() / len(df),
             'avg_title_length': df['title_length'].mean(),
-            'avg_answer_length': df[df['answer_length'] > 0]['answer_length'].mean()
+            'refers': df['refer'].value_counts().to_dict(),
+            'knowledge_points_coverage': knowledge_points_coverage
         }
         
         return stats
@@ -261,7 +272,7 @@ def main():
     print("\n=== 数据处理完成 ===")
     print(f"总题目数: {stats['total_questions']}")
     print(f"题型分布: {stats['question_types']}")
-    print(f"有答案题目比例: {stats['has_answer_ratio']:.2%}")
+    print(f"知识点覆盖率: {stats['knowledge_points_coverage']:.2%}")
 
 if __name__ == "__main__":
     main()

@@ -34,7 +34,8 @@ class ExamVisualizer:
             'accent': '#F18F01',
             'success': '#C73E1D',
             'warning': '#FFC300',
-            'info': '#4CAF50'
+            'info': '#4CAF50',
+            'palette': ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#FFC300', '#4CAF50', '#FF6B6B', '#4ECDC4']
         }
         
         # 设置输出目录
@@ -73,9 +74,14 @@ class ExamVisualizer:
         """分析知识点分布"""
         # 提取所有知识点
         all_knowledge_points = []
-        for kp_str in df['knowledge_points'].dropna():
-            if kp_str != '未识别':
-                points = [kp.strip() for kp in kp_str.split(';')]
+        for kp_data in df['knowledge_points'].dropna():
+            if isinstance(kp_data, list):
+                # 如果是列表格式
+                points = [kp.strip() for kp in kp_data if kp.strip() and kp.strip() != 'Uncategorized']
+                all_knowledge_points.extend(points)
+            elif isinstance(kp_data, str) and kp_data != '未识别' and kp_data != 'Uncategorized':
+                # 如果是字符串格式（向后兼容）
+                points = [kp.strip() for kp in kp_data.split(';') if kp.strip()]
                 all_knowledge_points.extend(points)
         
         # 统计知识点频率
@@ -85,10 +91,111 @@ class ExamVisualizer:
             'total_unique_points': len(kp_counter),
             'top_10_points': dict(kp_counter.most_common(10)),
             'total_mentions': sum(kp_counter.values()),
-            'coverage_rate': len([kp for kp in df['knowledge_points'] if kp != '未识别']) / len(df)
+            'coverage_rate': len([kp for kp in df['knowledge_points'] 
+                                 if isinstance(kp, list) and kp and kp != ['Uncategorized']]) / len(df)
         }
         
         return analysis
+    
+    def analyze_chapter_importance(self, df: pd.DataFrame) -> Dict[str, Any]:
+        """分析章节重要程度和题型分布"""
+        # 章节映射
+        chapter_mapping = {
+            '第1章': 'Characterization of Distributed Systems & System Models',
+            '第2章': 'Interprocess Communication', 
+            '第3章': 'Distributed Objects & Remote Invocation',
+            '第4章': 'Distributed File Systems',
+            '第5章': 'Peer-to-Peer File Sharing Systems',
+            '第6章': 'Name Services',
+            '第7章': 'Time and Global States'
+        }
+        
+        # 统计每个章节的题目数量
+        chapter_counts = {}
+        chapter_type_distribution = {}
+        
+        for chapter_num, chapter_name in chapter_mapping.items():
+            # 找到该章节的题目
+            chapter_questions = df[df['refer'].str.contains(chapter_num, na=False)]
+            chapter_counts[chapter_num] = len(chapter_questions)
+            
+            # 统计该章节的题型分布
+            if not chapter_questions.empty:
+                type_counts = chapter_questions['type'].value_counts().to_dict()
+                chapter_type_distribution[chapter_num] = type_counts
+            else:
+                chapter_type_distribution[chapter_num] = {}
+        
+        analysis = {
+            'chapter_counts': chapter_counts,
+            'chapter_type_distribution': chapter_type_distribution,
+            'total_chapters': len(chapter_mapping),
+            'most_important_chapter': max(chapter_counts, key=chapter_counts.get) if chapter_counts else None,
+            'least_important_chapter': min(chapter_counts, key=chapter_counts.get) if chapter_counts else None
+        }
+        
+        return analysis
+    
+    def plot_chapter_importance_analysis(self, df: pd.DataFrame) -> str:
+        """绘制章节重要程度和题型分布分析图"""
+        chapter_analysis = self.analyze_chapter_importance(df)
+        
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 12))
+        
+        # 1. 章节重要程度条形图
+        chapters = list(chapter_analysis['chapter_counts'].keys())
+        counts = list(chapter_analysis['chapter_counts'].values())
+        
+        bars = ax1.bar(range(len(chapters)), counts, 
+                      color=self.colors['primary'], alpha=0.7, edgecolor='black', linewidth=1)
+        ax1.set_title('各章节题目数量分布 (章节重要程度)', fontsize=16, fontweight='bold', pad=20)
+        ax1.set_xlabel('章节', fontsize=12)
+        ax1.set_ylabel('题目数量', fontsize=12)
+        ax1.set_xticks(range(len(chapters)))
+        ax1.set_xticklabels(chapters, rotation=45, ha='right')
+        ax1.grid(axis='y', alpha=0.3)
+        
+        # 在柱子上添加数值标签
+        for bar, count in zip(bars, counts):
+            height = bar.get_height()
+            ax1.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                    f'{int(count)}', ha='center', va='bottom', fontweight='bold')
+        
+        # 2. 章节题型分布堆叠图
+        chapter_types = chapter_analysis['chapter_type_distribution']
+        all_types = set()
+        for types_dict in chapter_types.values():
+            all_types.update(types_dict.keys())
+        all_types = sorted(list(all_types))
+        
+        # 准备堆叠数据
+        bottom_values = [0] * len(chapters)
+        colors = [self.colors['primary'], self.colors['secondary'], self.colors['accent'], 
+                 self.colors['success'], self.colors['warning'], self.colors['info']]
+        
+        for i, question_type in enumerate(all_types):
+            values = [chapter_types[chap].get(question_type, 0) for chap in chapters]
+            ax2.bar(range(len(chapters)), values, bottom=bottom_values, 
+                   label=question_type, color=colors[i % len(colors)], alpha=0.8)
+            bottom_values = [bottom + value for bottom, value in zip(bottom_values, values)]
+        
+        ax2.set_title('各章节题型分布', fontsize=16, fontweight='bold', pad=20)
+        ax2.set_xlabel('章节', fontsize=12)
+        ax2.set_ylabel('题目数量', fontsize=12)
+        ax2.set_xticks(range(len(chapters)))
+        ax2.set_xticklabels(chapters, rotation=45, ha='right')
+        ax2.legend(title='题型', bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax2.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        
+        # 保存图片
+        output_path = self.output_dir / 'chapter_importance_analysis.png'
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        self.logger.info(f"章节重要程度分析图已保存: {output_path}")
+        return str(output_path)
     
     def plot_question_type_distribution(self, df: pd.DataFrame) -> str:
         """绘制题型分布图"""
@@ -131,6 +238,113 @@ class ExamVisualizer:
         self.logger.info(f"题型分布图已保存: {output_path}")
         return str(output_path)
     
+    def plot_chapter_distribution(self, df: pd.DataFrame) -> str:
+        """绘制章节考试占比分析图"""
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+        fig.suptitle('分布式系统考试章节分析报告', fontsize=16, fontweight='bold')
+        
+        # 1. 章节题目数量分布（饼图）
+        chapter_counts = df['refer'].value_counts()
+        
+        # 简化章节名称显示
+        simplified_names = []
+        for chapter in chapter_counts.index:
+            if 'Chapter' in chapter:
+                # 提取章节号和关键词
+                parts = chapter.split('Chapter')[1].strip()
+                if ' ' in parts:
+                    chapter_num = parts.split(' ')[0]
+                    keywords = parts.split(' ')[-3:]  # 取最后3个关键词
+                    simplified_names.append(f"Ch{chapter_num} {' '.join(keywords)}")
+                else:
+                    simplified_names.append(f"Ch{parts}")
+            else:
+                simplified_names.append(chapter[:20] + '...' if len(chapter) > 20 else chapter)
+        
+        colors = plt.cm.Set3(range(len(chapter_counts)))
+        wedges, texts, autotexts = ax1.pie(chapter_counts.values, 
+                                          labels=simplified_names,
+                                          autopct='%1.1f%%', 
+                                          startangle=90,
+                                          colors=colors)
+        ax1.set_title('章节题目数量占比', fontsize=12, fontweight='bold')
+        
+        # 2. 章节题目数量（柱状图）
+        bars = ax2.bar(range(len(chapter_counts)), chapter_counts.values, 
+                      color=colors[:len(chapter_counts)])
+        ax2.set_title('各章节题目数量分布', fontsize=12, fontweight='bold')
+        ax2.set_xlabel('章节')
+        ax2.set_ylabel('题目数量')
+        ax2.set_xticks(range(len(chapter_counts)))
+        ax2.set_xticklabels(simplified_names, rotation=45, ha='right')
+        
+        # 在柱状图上添加数值标签
+        for i, bar in enumerate(bars):
+            height = bar.get_height()
+            ax2.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                    f'{int(height)}',
+                    ha='center', va='bottom', fontweight='bold')
+        
+        # 3. 章节vs题型分布（堆叠柱状图）
+        chapter_type_crosstab = pd.crosstab(df['refer'], df['type'])
+        chapter_type_crosstab.plot(kind='bar', stacked=True, ax=ax3, 
+                                  color=self.colors['palette'][:len(chapter_type_crosstab.columns)])
+        ax3.set_title('章节题型分布', fontsize=12, fontweight='bold')
+        ax3.set_xlabel('章节')
+        ax3.set_ylabel('题目数量')
+        ax3.tick_params(axis='x', rotation=45)
+        ax3.legend(title='题型', bbox_to_anchor=(1.05, 1), loc='upper left')
+        
+        # 4. 章节重要度分析（基于题目数量和平均长度）
+        chapter_stats = df.groupby('refer').agg({
+            'title_length': ['mean', 'count'],
+            'type': 'nunique'
+        }).round(1)
+        
+        chapter_stats.columns = ['平均题目长度', '题目数量', '题型种类']
+        chapter_stats['重要度得分'] = (
+            chapter_stats['题目数量'] * 0.5 + 
+            chapter_stats['题型种类'] * 0.3 + 
+            (chapter_stats['平均题目长度'] / 100) * 0.2
+        ).round(2)
+        
+        # 绘制重要度气泡图
+        x = chapter_stats['题目数量']
+        y = chapter_stats['平均题目长度']
+        sizes = chapter_stats['重要度得分'] * 100
+        
+        scatter = ax4.scatter(x, y, s=sizes, alpha=0.6, c=range(len(chapter_stats)), 
+                            cmap='viridis')
+        ax4.set_title('章节重要度分析', fontsize=12, fontweight='bold')
+        ax4.set_xlabel('题目数量')
+        ax4.set_ylabel('平均题目长度')
+        
+        # 添加章节标签
+        for i, (idx, row) in enumerate(chapter_stats.iterrows()):
+            chapter_short = simplified_names[list(chapter_counts.index).index(idx)] if idx in chapter_counts.index else str(idx)[:10]
+            ax4.annotate(chapter_short, 
+                        (row['题目数量'], row['平均题目长度']),
+                        xytext=(5, 5), textcoords='offset points',
+                        fontsize=8, alpha=0.8)
+        
+        plt.tight_layout()
+        
+        # 保存图片
+        output_path = self.output_dir / 'chapter_distribution_analysis.png'
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        self.logger.info(f"章节分布分析图已保存: {output_path}")
+        
+        # 打印详细统计
+        print("\n📚 章节详细统计:")
+        print("=" * 60)
+        for chapter, count in chapter_counts.items():
+            percentage = count / len(df) * 100
+            print(f"{chapter[:50]:50} {count:3d}题 ({percentage:5.1f}%)")
+        
+        return str(output_path)
+    
     def plot_chapter_importance_analysis(self, df: pd.DataFrame) -> str:
         """绘制章节重要程度和题型分布分析图 - 为了百万年薪！"""
         # 分析refer字段，提取章节信息
@@ -140,12 +354,23 @@ class ExamVisualizer:
             refer = str(row.get('refer', ''))
             question_type = str(row.get('type', ''))
             
-            # 从refer中提取章节号
-            chapter_match = re.search(r'第(\d+)章', refer)
+            # 从refer中提取章节号 - 支持英文格式
+            chapter_match = re.search(r'Chapter\s+(\d+)', refer, re.IGNORECASE)
+            if not chapter_match:
+                # 也支持中文格式
+                chapter_match = re.search(r'第(\d+)章', refer)
+            
             if chapter_match:
                 chapter_num = int(chapter_match.group(1))
                 chapter_data.append({
                     'chapter': chapter_num,
+                    'type': question_type,
+                    'refer': refer
+                })
+            else:
+                # 如果没有找到章节号，使用refer的前20个字符作为标识
+                chapter_data.append({
+                    'chapter': refer[:20] + '...' if len(refer) > 20 else refer,
                     'type': question_type,
                     'refer': refer
                 })
@@ -157,8 +382,28 @@ class ExamVisualizer:
         # 转换为DataFrame
         chapter_df = pd.DataFrame(chapter_data)
         
-        # 统计每个章节的题目数量
-        chapter_counts = chapter_df['chapter'].value_counts().sort_index()
+        # 统计每个章节的题目数量 - 处理混合数据类型
+        chapter_counts = chapter_df['chapter'].value_counts()
+        # 分别处理数字和字符串章节
+        numeric_chapters = {}
+        string_chapters = {}
+        
+        for chapter, count in chapter_counts.items():
+            if isinstance(chapter, int):
+                numeric_chapters[chapter] = count
+            else:
+                string_chapters[chapter] = count
+        
+        # 先按数字章节排序，再添加字符串章节
+        sorted_chapters = {}
+        if numeric_chapters:
+            for ch in sorted(numeric_chapters.keys()):
+                sorted_chapters[ch] = numeric_chapters[ch]
+        if string_chapters:
+            for ch in sorted(string_chapters.keys()):
+                sorted_chapters[ch] = string_chapters[ch]
+        
+        chapter_counts = pd.Series(sorted_chapters)
         
         # 统计每个章节的题型分布
         chapter_type_matrix = pd.crosstab(chapter_df['chapter'], chapter_df['type'])
@@ -233,9 +478,14 @@ class ExamVisualizer:
         """绘制知识点分析图"""
         # 提取知识点数据
         all_knowledge_points = []
-        for kp_str in df['knowledge_points'].dropna():
-            if kp_str != '未识别':
-                points = [kp.strip() for kp in kp_str.split(';')]
+        for kp_data in df['knowledge_points'].dropna():
+            if isinstance(kp_data, list):
+                # 如果是列表格式
+                points = [kp.strip() for kp in kp_data if kp.strip() and kp.strip() != 'Uncategorized']
+                all_knowledge_points.extend(points)
+            elif isinstance(kp_data, str) and kp_data != '未识别' and kp_data != 'Uncategorized':
+                # 如果是字符串格式（向后兼容）
+                points = [kp.strip() for kp in kp_data.split(';') if kp.strip()]
                 all_knowledge_points.extend(points)
         
         if not all_knowledge_points:
@@ -268,17 +518,35 @@ class ExamVisualizer:
         # 知识点覆盖率分析
         coverage_data = []
         for _, row in df.iterrows():
-            kp_str = row['knowledge_points']
-            if kp_str == '未识别' or pd.isna(kp_str):
-                coverage_data.append('未识别')
-            else:
-                kp_count = len([kp.strip() for kp in kp_str.split(';')])
-                if kp_count == 1:
-                    coverage_data.append('单个知识点')
-                elif kp_count <= 3:
-                    coverage_data.append('2-3个知识点')
+            kp_data = row['knowledge_points']
+            if isinstance(kp_data, list):
+                # 列表格式
+                if not kp_data or kp_data == ['Uncategorized']:
+                    coverage_data.append('未识别')
                 else:
-                    coverage_data.append('3+个知识点')
+                    kp_count = len([kp for kp in kp_data if kp.strip() and kp.strip() != 'Uncategorized'])
+                    if kp_count == 0:
+                        coverage_data.append('未识别')
+                    elif kp_count == 1:
+                        coverage_data.append('单个知识点')
+                    elif kp_count <= 3:
+                        coverage_data.append('2-3个知识点')
+                    else:
+                        coverage_data.append('4+个知识点')
+            elif isinstance(kp_data, str):
+                # 字符串格式（向后兼容）
+                if kp_data == '未识别' or kp_data == 'Uncategorized' or pd.isna(kp_data):
+                    coverage_data.append('未识别')
+                else:
+                    kp_count = len([kp.strip() for kp in kp_data.split(';')])
+                    if kp_count == 1:
+                        coverage_data.append('单个知识点')
+                    elif kp_count <= 3:
+                        coverage_data.append('2-3个知识点')
+                    else:
+                        coverage_data.append('4+个知识点')
+            else:
+                coverage_data.append('未识别')
         
         coverage_counts = pd.Series(coverage_data).value_counts()
         
@@ -327,18 +595,18 @@ class ExamVisualizer:
             row=1, col=2
         )
         
-        # 答案完整性
-        answer_status = df['has_answer'].value_counts()
+        # 题型分布
+        type_counts = df['type'].value_counts()
         fig.add_trace(
-            go.Bar(x=answer_status.index, y=answer_status.values,
-                   name="答案完整性", marker_color=self.colors['secondary']),
+            go.Bar(x=type_counts.index, y=type_counts.values,
+                   name="题型分布", marker_color=self.colors['secondary']),
             row=2, col=1
         )
         
-        # 题目复杂度散点图
+        # 题目长度分布散点图
         fig.add_trace(
-            go.Scatter(x=df['title_length'], y=df['answer_length'],
-                      mode='markers', name="复杂度分析",
+            go.Scatter(x=df.index, y=df['title_length'],
+                      mode='markers', name="题目长度分布",
                       text=df['type'], hovertemplate='<b>%{text}</b><br>题目长度: %{x}<br>答案长度: %{y}',
                       marker=dict(color=df['title_length'], 
                                 colorscale='Viridis', size=8)),
@@ -366,13 +634,13 @@ class ExamVisualizer:
                 'total_questions': len(df),
                 'total_sources': df['source'].nunique(),
                 'question_types': df['type'].nunique(),
-                'answer_coverage': (df['has_answer'] == '是').mean() * 100
+                'knowledge_coverage': len([kp for kp in df['knowledge_points'] 
+                                         if isinstance(kp, list) and kp and kp != ['Uncategorized']]) / len(df) * 100
             },
             'type_analysis': self.analyze_question_types(df),
             'knowledge_analysis': self.analyze_knowledge_points(df),
             'difficulty_analysis': {
                 'avg_title_length': df['title_length'].mean(),
-                'avg_answer_length': df[df['answer_length'] > 0]['answer_length'].mean(),
                 'complex_questions': len(df[df['title_length'] > df['title_length'].quantile(0.75)])
             },
             'recommendations': self._generate_recommendations(df)
@@ -391,19 +659,23 @@ class ExamVisualizer:
         
         # 基于知识点的建议
         all_kp = []
-        for kp_str in df['knowledge_points'].dropna():
-            if kp_str != '未识别':
-                all_kp.extend([kp.strip() for kp in kp_str.split(';')])
+        for kp_data in df['knowledge_points'].dropna():
+            if isinstance(kp_data, list):
+                # 列表格式
+                all_kp.extend([kp.strip() for kp in kp_data if kp.strip() and kp.strip() != 'Uncategorized'])
+            elif isinstance(kp_data, str) and kp_data != '未识别' and kp_data != 'Uncategorized':
+                # 字符串格式（向后兼容）
+                all_kp.extend([kp.strip() for kp in kp_data.split(';')])
         
         if all_kp:
             kp_counter = Counter(all_kp)
             top_kp = kp_counter.most_common(3)
             recommendations.append(f"高频知识点：{', '.join([kp[0] for kp in top_kp])}")
         
-        # 基于答案完整性的建议
-        answer_rate = (df['has_answer'] == '是').mean()
-        if answer_rate < 0.5:
-            recommendations.append("建议补充更多标准答案，提高复习效果")
+        # 基于题目复杂度的建议
+        avg_length = df['title_length'].mean()
+        if avg_length > 500:
+            recommendations.append("题目普遍较长，建议加强理解能力训练")
         
         return recommendations
     

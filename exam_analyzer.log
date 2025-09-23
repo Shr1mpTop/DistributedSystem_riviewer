@@ -1,0 +1,101 @@
+2025-09-24 01:10:34,945 - __main__ - INFO - 🚀 启动 NTU分布式系统考试指南
+2025-09-24 01:10:34,945 - __main__ - INFO - 正在检查运行环境...
+2025-09-24 01:10:34,946 - __main__ - INFO - 环境检查完成，发现 8 个PDF文件
+2025-09-24 01:10:35,010 - __main__ - INFO - PDF解析器初始化成功
+2025-09-24 01:10:35,010 - __main__ - INFO - === 开始PDF分析阶段 ===
+2025-09-24 01:10:35,010 - src.pdf_parser - INFO - 发现 8 个PDF文件
+2025-09-24 01:10:35,010 - src.pdf_parser - INFO - 使用串行处理以避免API速率限制...
+2025-09-24 01:10:35,025 - src.pdf_parser - INFO - 处理第 1/8 个文件: 8.pdf
+2025-09-24 01:10:35,026 - src.pdf_parser - INFO - 开始处理: 8.pdf
+2025-09-24 01:10:35,026 - src.pdf_parser - INFO - 正在分析 8.pdf... (尝试 1/3)
+2025-09-24 01:10:35,032 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-09-24 01:11:45,323 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent "HTTP/1.1 200 OK"
+2025-09-24 01:11:45,330 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-09-24 01:11:45,331 - src.pdf_parser - INFO - AI响应长度: 8945 字符
+2025-09-24 01:11:45,331 - src.pdf_parser - INFO - JSON解析成功 (方式 1)
+2025-09-24 01:11:45,331 - src.pdf_parser - INFO - 8.pdf 解析完成，提取到 6 道题目
+2025-09-24 01:11:45,333 - src.pdf_parser - INFO - 处理第 2/8 个文件: 6.pdf
+2025-09-24 01:11:47,335 - src.pdf_parser - INFO - 开始处理: 6.pdf
+2025-09-24 01:11:47,336 - src.pdf_parser - INFO - 正在分析 6.pdf... (尝试 1/3)
+2025-09-24 01:11:47,343 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-09-24 01:12:55,802 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent "HTTP/1.1 200 OK"
+2025-09-24 01:12:55,822 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-09-24 01:12:55,825 - src.pdf_parser - INFO - AI响应长度: 10937 字符
+2025-09-24 01:12:55,826 - src.pdf_parser - INFO - JSON解析成功 (方式 1)
+2025-09-24 01:12:55,826 - src.pdf_parser - INFO - 6.pdf 解析完成，提取到 10 道题目
+2025-09-24 01:12:55,827 - src.pdf_parser - INFO - 处理第 3/8 个文件: 7.pdf
+2025-09-24 01:12:57,829 - src.pdf_parser - INFO - 开始处理: 7.pdf
+2025-09-24 01:12:57,830 - src.pdf_parser - INFO - 正在分析 7.pdf... (尝试 1/3)
+2025-09-24 01:12:57,835 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-09-24 01:14:08,103 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent "HTTP/1.1 200 OK"
+2025-09-24 01:14:08,106 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-09-24 01:14:08,107 - src.pdf_parser - INFO - AI响应长度: 14390 字符
+2025-09-24 01:14:08,107 - src.pdf_parser - INFO - JSON解析成功 (方式 1)
+2025-09-24 01:14:08,107 - src.pdf_parser - INFO - 7.pdf 解析完成，提取到 20 道题目
+2025-09-24 01:14:08,107 - src.pdf_parser - INFO - 处理第 4/8 个文件: 5.pdf
+2025-09-24 01:14:10,109 - src.pdf_parser - INFO - 开始处理: 5.pdf
+2025-09-24 01:14:10,110 - src.pdf_parser - INFO - 正在分析 5.pdf... (尝试 1/3)
+2025-09-24 01:14:10,116 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-09-24 01:15:20,365 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent "HTTP/1.1 200 OK"
+2025-09-24 01:15:20,369 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-09-24 01:15:20,369 - src.pdf_parser - INFO - AI响应长度: 10693 字符
+2025-09-24 01:15:20,370 - src.pdf_parser - INFO - JSON解析成功 (方式 1)
+2025-09-24 01:15:20,370 - src.pdf_parser - INFO - 5.pdf 解析完成，提取到 9 道题目
+2025-09-24 01:15:20,372 - src.pdf_parser - INFO - 处理第 5/8 个文件: 4.pdf
+2025-09-24 01:15:22,373 - src.pdf_parser - INFO - 开始处理: 4.pdf
+2025-09-24 01:15:22,374 - src.pdf_parser - INFO - 正在分析 4.pdf... (尝试 1/3)
+2025-09-24 01:15:22,382 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-09-24 01:16:55,081 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent "HTTP/1.1 200 OK"
+2025-09-24 01:16:55,086 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-09-24 01:16:55,086 - src.pdf_parser - INFO - AI响应长度: 15299 字符
+2025-09-24 01:16:55,087 - src.pdf_parser - INFO - JSON解析成功 (方式 1)
+2025-09-24 01:16:55,087 - src.pdf_parser - INFO - 4.pdf 解析完成，提取到 20 道题目
+2025-09-24 01:16:55,091 - src.pdf_parser - INFO - 处理第 6/8 个文件: 1.pdf
+2025-09-24 01:16:57,093 - src.pdf_parser - INFO - 开始处理: 1.pdf
+2025-09-24 01:16:57,094 - src.pdf_parser - INFO - 正在分析 1.pdf... (尝试 1/3)
+2025-09-24 01:16:57,096 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-09-24 01:18:32,108 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent "HTTP/1.1 200 OK"
+2025-09-24 01:18:32,122 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-09-24 01:18:32,122 - src.pdf_parser - INFO - AI响应长度: 12974 字符
+2025-09-24 01:18:32,123 - src.pdf_parser - INFO - JSON解析成功 (方式 1)
+2025-09-24 01:18:32,123 - src.pdf_parser - INFO - 1.pdf 解析完成，提取到 16 道题目
+2025-09-24 01:18:32,123 - src.pdf_parser - INFO - 处理第 7/8 个文件: 3.pdf
+2025-09-24 01:18:34,125 - src.pdf_parser - INFO - 开始处理: 3.pdf
+2025-09-24 01:18:34,126 - src.pdf_parser - INFO - 正在分析 3.pdf... (尝试 1/3)
+2025-09-24 01:18:34,132 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-09-24 01:19:28,475 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent "HTTP/1.1 200 OK"
+2025-09-24 01:19:28,477 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-09-24 01:19:28,478 - src.pdf_parser - INFO - AI响应长度: 9245 字符
+2025-09-24 01:19:28,478 - src.pdf_parser - INFO - JSON解析成功 (方式 1)
+2025-09-24 01:19:28,478 - src.pdf_parser - INFO - 3.pdf 解析完成，提取到 6 道题目
+2025-09-24 01:19:28,479 - src.pdf_parser - INFO - 处理第 8/8 个文件: 2.pdf
+2025-09-24 01:19:30,480 - src.pdf_parser - INFO - 开始处理: 2.pdf
+2025-09-24 01:19:30,481 - src.pdf_parser - INFO - 正在分析 2.pdf... (尝试 1/3)
+2025-09-24 01:19:30,484 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-09-24 01:21:14,506 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent "HTTP/1.1 200 OK"
+2025-09-24 01:21:14,510 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-09-24 01:21:14,510 - src.pdf_parser - INFO - AI响应长度: 13820 字符
+2025-09-24 01:21:14,511 - src.pdf_parser - INFO - JSON解析成功 (方式 1)
+2025-09-24 01:21:14,511 - src.pdf_parser - INFO - 2.pdf 解析完成，提取到 16 道题目
+2025-09-24 01:21:14,516 - src.pdf_parser - INFO - 解析结果已保存到: output/parsed_questions.json
+2025-09-24 01:21:14,516 - src.pdf_parser - INFO - 总共提取到 103 道题目
+2025-09-24 01:21:14,516 - __main__ - INFO - PDF分析完成，提取到 103 道题目
+2025-09-24 01:21:14,516 - __main__ - INFO - === 开始数据处理阶段 ===
+2025-09-24 01:21:14,518 - src.data_processor - INFO - 成功加载 103 道题目
+2025-09-24 01:21:14,539 - src.data_processor - INFO - 成功处理 103 道题目数据
+2025-09-24 01:21:14,553 - src.data_processor - INFO - 核心数据已导出到: output/questions.csv
+2025-09-24 01:21:14,553 - src.data_processor - INFO - 完整数据已导出到: output/questions_full.csv
+2025-09-24 01:21:14,556 - src.data_processor - INFO - 统计信息已保存到: output/statistics.json
+2025-09-24 01:21:14,556 - __main__ - INFO - 数据处理阶段完成
+2025-09-24 01:21:14,556 - __main__ - INFO - === 开始可视化分析阶段 ===
+2025-09-24 01:21:14,559 - src.visualizer - INFO - 成功加载 103 条数据
+2025-09-24 01:21:14,907 - src.visualizer - INFO - 题型分布图已保存: output/visualizations/question_type_distribution.png
+2025-09-24 01:21:15,465 - src.visualizer - INFO - 章节重要程度分析图已保存: output/visualizations/chapter_importance_analysis.png
+2025-09-24 01:21:15,703 - src.visualizer - INFO - 知识点分析图已保存: output/visualizations/knowledge_points_analysis.png
+2025-09-24 01:21:15,785 - src.visualizer - INFO - 交互式仪表板已保存: output/visualizations/interactive_dashboard.html
+2025-09-24 01:21:15,789 - src.visualizer - INFO - 洞察报告已保存: output/visualizations/exam_insights_report.json
+2025-09-24 01:21:15,789 - src.visualizer - INFO - 所有可视化图表生成完成
+2025-09-24 01:21:15,789 - __main__ - INFO - 可视化分析阶段完成
+2025-09-24 01:21:15,789 - __main__ - INFO - === 生成最终报告 ===
+2025-09-24 01:21:15,791 - __main__ - INFO - 最终报告已生成: output/final_analysis_report.json
+2025-09-24 01:21:15,791 - __main__ - INFO - 🎉 分析流程全部完成！

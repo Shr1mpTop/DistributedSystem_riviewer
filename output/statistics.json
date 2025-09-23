@@ -1,23 +1,21 @@
 {
-  "total_questions": 155,
+  "total_questions": 16,
   "question_types": {
-    "计算题": 76,
-    "简答题": 62,
-    "论述题": 7,
-    "编程题": 6,
-    "填空题": 4
+    "Calculation": 10,
+    "Short Answer": 4,
+    "Programming": 1,
+    "Fill in Blank": 1
   },
   "sources": {
-    "3.pdf": 22,
-    "8.pdf": 20,
-    "6.pdf": 20,
-    "7.pdf": 20,
-    "5.pdf": 20,
-    "4.pdf": 20,
-    "1.pdf": 17,
-    "2.pdf": 16
+    "1.pdf": 16
   },
-  "has_answer_ratio": 0.0,
-  "avg_title_length": 362.30967741935484,
-  "avg_answer_length": NaN
+  "avg_title_length": 482.625,
+  "refers": {
+    "Chapter 1 Characterization of Distributed Systems & System Models": 6,
+    "Chapter 7 Time and Global States": 5,
+    "Chapter 4 Distributed File Systems": 2,
+    "Uncategorized": 2,
+    "Chapter 3 Distributed Objects & Remote Invocation": 1
+  },
+  "knowledge_points_coverage": 0.875
 }
