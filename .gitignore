@@ -9,5 +9,11 @@
 # Python
 __pycache__/
 
-# test
-test
+# Test files and results
+test*
+*test*
+*_test*
+test_*
+*.test
+test_result*.json
+exam_analyzer.log
