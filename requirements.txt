@@ -1,0 +1,25 @@
+# Core dependencies
+python-dotenv
+pandas
+matplotlib
+plotly
+seaborn
+
+# Google AI dependencies
+google-genai
+
+# PDF processing
+PyPDF2
+pdfplumber
+
+# Data processing
+numpy
+openpyxl
+
+# Async processing
+aiohttp
+asyncio
+
+# Logging and utilities
+tqdm
+colorama
