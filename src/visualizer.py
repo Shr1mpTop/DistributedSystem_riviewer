@@ -131,6 +131,104 @@ class ExamVisualizer:
         self.logger.info(f"题型分布图已保存: {output_path}")
         return str(output_path)
     
+    def plot_chapter_importance_analysis(self, df: pd.DataFrame) -> str:
+        """绘制章节重要程度和题型分布分析图 - 为了百万年薪！"""
+        # 分析refer字段，提取章节信息
+        chapter_data = []
+        
+        for _, row in df.iterrows():
+            refer = str(row.get('refer', ''))
+            question_type = str(row.get('type', ''))
+            
+            # 从refer中提取章节号
+            chapter_match = re.search(r'第(\d+)章', refer)
+            if chapter_match:
+                chapter_num = int(chapter_match.group(1))
+                chapter_data.append({
+                    'chapter': chapter_num,
+                    'type': question_type,
+                    'refer': refer
+                })
+        
+        if not chapter_data:
+            self.logger.warning("没有找到章节相关数据")
+            return ""
+        
+        # 转换为DataFrame
+        chapter_df = pd.DataFrame(chapter_data)
+        
+        # 统计每个章节的题目数量
+        chapter_counts = chapter_df['chapter'].value_counts().sort_index()
+        
+        # 统计每个章节的题型分布
+        chapter_type_matrix = pd.crosstab(chapter_df['chapter'], chapter_df['type'])
+        
+        # 创建子图
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+        
+        # 子图1: 章节重要程度条形图
+        chapters = [f'第{i}章' for i in range(1, 8)]
+        chapter_values = [chapter_counts.get(i, 0) for i in range(1, 8)]
+        
+        bars1 = ax1.bar(range(len(chapters)), chapter_values, 
+                       color=[self.colors['primary'], self.colors['secondary'], 
+                             self.colors['accent'], self.colors['success'],
+                             self.colors['warning'], self.colors['info'], '#9C27B0'])
+        ax1.set_title('📊 章节重要程度分析 (题目数量)', fontsize=16, fontweight='bold', pad=20)
+        ax1.set_xlabel('课程章节', fontsize=12)
+        ax1.set_ylabel('题目数量', fontsize=12)
+        ax1.set_xticks(range(len(chapters)))
+        ax1.set_xticklabels(chapters, rotation=45, ha='right')
+        
+        # 添加数值标签
+        for bar in bars1:
+            height = bar.get_height()
+            ax1.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                    f'{int(height)}', ha='center', va='bottom', fontweight='bold')
+        
+        # 子图2: 章节题型分布堆叠条形图
+        chapter_type_matrix = chapter_type_matrix.reindex(range(1, 8), fill_value=0)
+        chapter_type_matrix.plot(kind='bar', stacked=True, ax=ax2, 
+                               color=[self.colors['primary'], self.colors['secondary'], 
+                                     self.colors['accent'], self.colors['success'],
+                                     self.colors['warning'], self.colors['info']])
+        ax2.set_title('🎯 章节题型分布分析', fontsize=16, fontweight='bold', pad=20)
+        ax2.set_xlabel('课程章节', fontsize=12)
+        ax2.set_ylabel('题目数量', fontsize=12)
+        ax2.legend(title='题型', bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax2.set_xticklabels([f'第{i}章' for i in range(1, 8)], rotation=45, ha='right')
+        
+        # 子图3: 题型在各章节的分布热力图
+        if not chapter_type_matrix.empty:
+            sns.heatmap(chapter_type_matrix.T, annot=True, fmt='d', 
+                       cmap='YlOrRd', ax=ax3, cbar_kws={'label': '题目数量'})
+            ax3.set_title('🔥 题型-章节热力图分析', fontsize=16, fontweight='bold', pad=20)
+            ax3.set_xlabel('课程章节', fontsize=12)
+            ax3.set_ylabel('题型', fontsize=12)
+            ax3.set_xticklabels([f'第{i}章' for i in range(1, 8)], rotation=45, ha='right')
+        
+        # 子图4: 章节覆盖率饼图
+        total_questions = len(df)
+        chapter_coverage = [(count / total_questions) * 100 for count in chapter_values]
+        
+        wedges, texts, autotexts = ax4.pie(chapter_coverage, 
+                                          labels=[f'第{i}章\n({chapter_values[i-1]})' for i in range(1, 8)],
+                                          autopct='%1.1f%%', startangle=90,
+                                          colors=[self.colors['primary'], self.colors['secondary'], 
+                                                 self.colors['accent'], self.colors['success'],
+                                                 self.colors['warning'], self.colors['info'], '#9C27B0'])
+        ax4.set_title('📈 章节覆盖率分析', fontsize=16, fontweight='bold', pad=20)
+        
+        plt.tight_layout()
+        
+        # 保存图片
+        output_path = self.output_dir / 'chapter_importance_analysis.png'
+        plt.savefig(output_path, dpi=300, bbox_inches='tight', bbox_extra_artists=[])
+        plt.close()
+        
+        self.logger.info(f"章节重要程度分析图已保存: {output_path}")
+        return str(output_path)
+    
     def plot_knowledge_points_analysis(self, df: pd.DataFrame) -> str:
         """绘制知识点分析图"""
         # 提取知识点数据
@@ -339,6 +437,9 @@ class ExamVisualizer:
         try:
             # 题型分布图
             results['type_distribution'] = self.plot_question_type_distribution(df)
+            
+            # 章节重要程度分析图
+            results['chapter_importance'] = self.plot_chapter_importance_analysis(df)
             
             # 知识点分析图
             results['knowledge_analysis'] = self.plot_knowledge_points_analysis(df)

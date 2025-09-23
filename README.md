@@ -2,6 +2,9 @@
 
 ## 📊 数据可视化展示
 
+### 章节重要程度分析
+![章节重要程度分析](output/visualizations/chapter_importance_analysis.png)
+
 ### 题型分布分析
 ![题型分布](output/visualizations/question_type_distribution.png)
 
@@ -70,10 +73,6 @@
 - **CSV格式**: id, title, type, answer
 - **JSON格式**: {"id":"", "title":"", "type":"", "answer":"", "refer":""}
 
-## 注意事项
-- ⚠️ 请确保已正确配置Google AI API密钥
-- 📁 PDF文件应放置在项目根目录
-- 🔒 .env文件包含敏感信息，请勿提交到版本控制
 
 ## 技术栈
 - Python 3.8+
