@@ -1,5 +1,15 @@
 # 分布式系统考试指南项目
 
+## 📊 数据可视化展示
+
+### 题型分布分析
+![题型分布](output/visualizations/question_type_distribution.png)
+
+### 知识点分析
+![知识点分析](output/visualizations/knowledge_points_analysis.png)
+
+> 📥 **下载完整数据**: [questions_full.csv](https://github.com/Shr1mpTop/DistributedSystem_riviewer/raw/main/output/questions_full.csv)
+
 ## 项目概述
 这是一个用于分析NTU分布式系统考试题目的项目，通过AI技术自动化提取和分析PDF中的考试题目。
 
