@@ -23,6 +23,7 @@ sys.path.append(str(Path(__file__).parent))
 from src.pdf_parser import PDFParser
 from src.data_processor import DataProcessor
 from src.visualizer import ExamVisualizer
+from src.question_extender import QuestionExtender, load_curriculum
 
 class DistributedSystemExamAnalyzer:
     def __init__(self):
@@ -170,6 +171,50 @@ class DistributedSystemExamAnalyzer:
             self.logger.error(f"可视化分析阶段失败: {e}")
             return False
     
+    async def run_question_extension(self) -> bool:
+        """运行问题扩展流程"""
+        self.logger.info("=== 问题扩展阶段 ===")
+        
+        try:
+            # 加载课程大纲
+            curriculum_path = Path('data/curriculum.json')
+            if not curriculum_path.exists():
+                self.logger.error(f"课程大纲文件不存在: {curriculum_path}")
+                return False
+            
+            curriculum_data = load_curriculum(str(curriculum_path))
+            self.logger.info("✅ 课程大纲加载成功")
+            
+            # 创建问题扩展器
+            extender = QuestionExtender(curriculum_data)
+            
+            # 加载解析后的题目
+            parsed_questions_path = Path('output/parsed_questions.json')
+            if not parsed_questions_path.exists():
+                self.logger.error(f"解析后的题目文件不存在: {parsed_questions_path}")
+                return False
+            
+            with open(parsed_questions_path, 'r', encoding='utf-8') as f:
+                parsed_data = json.load(f)
+            
+            questions = parsed_data['questions']
+            self.logger.info(f"✅ 加载了 {len(questions)} 个待扩展题目")
+            
+            # 执行问题扩展
+            extended_questions = await extender.extend_questions(questions, concurrency=3)
+            
+            # 保存扩展后的题目
+            extended_output_path = Path('output/extended_questions.json')
+            from src.question_extender import save_extended_questions
+            save_extended_questions(extended_questions, str(extended_output_path))
+            
+            self.logger.info(f"✅ 问题扩展完成，共生成 {len(extended_questions)} 个题目")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"问题扩展阶段失败: {e}")
+            return False
+    
     def generate_final_report(self) -> str:
         """生成最终分析报告"""
         self.logger.info("=== 生成最终报告 ===")
@@ -244,6 +289,7 @@ class DistributedSystemExamAnalyzer:
         output_files = [
             "output/questions.csv - 核心题目数据",
             "output/questions_full.csv - 完整题目数据", 
+            "output/extended_questions.json - 扩展后题目数据",
             "output/statistics.json - 统计信息",
             "output/visualizations/ - 可视化图表",
             "output/final_analysis_report.json - 最终报告"
@@ -285,7 +331,12 @@ class DistributedSystemExamAnalyzer:
             self.logger.error("数据处理失败，程序退出")
             sys.exit(1)
         
-        # 5. 可视化分析
+        # 5. 问题扩展
+        if not await self.run_question_extension():
+            self.logger.error("问题扩展失败，程序退出")
+            sys.exit(1)
+        
+        # 6. 可视化分析
         if not self.run_visualization():
             self.logger.error("可视化分析失败，程序退出")
             sys.exit(1)

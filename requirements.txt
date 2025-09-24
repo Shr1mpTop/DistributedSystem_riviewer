@@ -6,7 +6,7 @@ plotly
 seaborn
 
 # Google AI dependencies
-google-genai
+google-generativeai
 
 # PDF processing
 PyPDF2
