@@ -1,6 +1,12 @@
 # 分布式系统考试指南项目
 
-## 📊 数据可视化预览
+### 🌐 在线演示
+
+> 🚀 **GitHub Pages**: [查看在线数据可视化](https://shrimptop.github.io/DistributedSystem_riviewer/)
+
+点击上方链接即可直接在浏览器中体验完整的交互式数据可视化界面，无需本地部署！
+
+## 📊 数据可视化展示可视化预览
 
 ### 章节重要性分析
 ![章节重要性分析](output/visualizations/chapter_importance.png)
@@ -14,11 +20,13 @@
 ### 题型分布饼图
 ![题型分布饼图](output/visualizations/question_types_pie.png)
 
-## 📊 数据可视化展示
+## 🌐 在线演示
 
-> 💡 **可视化功能**: 项目提供丰富的交互式数据可视化界面，可在浏览器中查看详细的分析结果。
+> � **GitHub Pages**: [查看在线数据可视化](https://shrimptop.github.io/DistributedSystem_riviewer/)
 
-> 📥 **下载完整数据**: [questions_full.csv](https://raw.githubusercontent.com/Shr1mpTop/DistributedSystem_riviewer/main/output/questions_full.csv) (右键另存为下载)
+点击上方链接即可直接在浏览器中体验完整的交互式数据可视化界面，无需本地部署！
+
+## 📊 数据可视化预览
 
 ## 项目概述
 这是一个用于分析NTU分布式系统考试题目的项目，通过AI技术自动化提取和分析PDF中的考试题目。
@@ -44,6 +52,10 @@
 ├── output/              # 输出结果目录
 │   ├── questions.csv    # 提取的题目CSV
 │   └── visualizations/  # 可视化图表
+├── docs/                # GitHub Pages网站目录
+│   ├── index.html       # 主页面
+│   ├── styles.css       # 样式文件
+│   └── app.js          # 交互逻辑
 └── *.pdf               # 考试试卷PDF文件
 ```
 
