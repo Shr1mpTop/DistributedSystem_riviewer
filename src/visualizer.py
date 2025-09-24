@@ -81,6 +81,31 @@ class ExamVisualizer:
             self.logger.error(f"JSON解析错误: {e}")
             raise
 
+    def export_to_csv(self, output_path: str = "output/questions.csv") -> str:
+        """导出题目数据到CSV文件"""
+        try:
+            # 确保输出目录存在
+            Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+            # 导出核心字段到CSV (移除answer字段以减小文件大小)
+            core_columns = ['id', 'title', 'type', 'refer', 'knowledge_points', 'source']
+            if all(col in self.questions_df.columns for col in core_columns):
+                csv_df = self.questions_df[core_columns].copy()
+                # 将knowledge_points列表转换为字符串
+                csv_df['knowledge_points'] = csv_df['knowledge_points'].apply(
+                    lambda x: '; '.join(x) if isinstance(x, list) else str(x)
+                )
+                csv_df.to_csv(output_path, index=False, encoding='utf-8-sig')
+                self.logger.info(f"题目数据已导出到CSV: {output_path}")
+                return output_path
+            else:
+                self.logger.error("DataFrame缺少必要的列")
+                return ""
+
+        except Exception as e:
+            self.logger.error(f"CSV导出失败: {e}")
+            return ""
+
     def create_curriculum_timeline(self) -> str:
         """创建课程时间线可视化 - 水平章节布局"""
         self.logger.info("开始创建课程时间线可视化...")
@@ -349,363 +374,7 @@ class ExamVisualizer:
 
         return str(png_path)
 
-    def create_comprehensive_dashboard(self) -> str:
-        """创建综合数据分析网页 - 多维度专业分析"""
-        self.logger.info("创建综合数据分析网页...")
 
-        # 准备各种统计数据
-        stats_data = self._prepare_dashboard_stats()
-
-        # 创建各个图表的JSON数据
-        charts_data = {
-            'question_types': self._create_question_types_chart_data(),
-            'chapter_distribution': self._create_chapter_distribution_data(),
-            'knowledge_points_analysis': self._create_knowledge_points_analysis_data(),
-            'difficulty_analysis': self._create_difficulty_analysis_data(),
-            'temporal_distribution': self._create_temporal_distribution_data()
-        }
-
-        # 创建HTML内容
-        html_content = f"""
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NTU分布式系统考试分析仪表板</title>
-    <script src="https://cdn.plotly.com/plotly-latest.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }}
-        .dashboard-container {{
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }}
-        .header {{
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
-        }}
-        .header h1 {{
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }}
-        .header p {{
-            font-size: 1.2em;
-            opacity: 0.9;
-        }}
-        .stats-overview {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }}
-        .stat-card {{
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease;
-        }}
-        .stat-card:hover {{
-            transform: translateY(-5px);
-        }}
-        .stat-number {{
-            font-size: 3em;
-            font-weight: bold;
-            color: {self.colors['primary']};
-            margin-bottom: 10px;
-        }}
-        .stat-label {{
-            font-size: 1.1em;
-            color: #666;
-            margin-bottom: 5px;
-        }}
-        .stat-trend {{
-            font-size: 0.9em;
-            color: {self.colors['success']};
-        }}
-        .charts-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }}
-        .chart-card {{
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }}
-        .chart-header {{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }}
-        .chart-title {{
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #333;
-        }}
-        .chart-description {{
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }}
-        .full-width-chart {{
-            grid-column: 1 / -1;
-            margin-bottom: 30px;
-        }}
-        .insights-section {{
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }}
-        .insights-title {{
-            font-size: 2em;
-            margin-bottom: 20px;
-            color: #333;
-        }}
-        .insights-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }}
-        .insight-card {{
-            background: linear-gradient(135deg, {self.colors['info']}, {self.colors['primary']});
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }}
-        .insight-title {{
-            font-weight: bold;
-            margin-bottom: 10px;
-        }}
-        .footer {{
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }}
-        .tab-container {{
-            margin-bottom: 20px;
-        }}
-        .tab-buttons {{
-            display: flex;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 5px;
-            margin-bottom: 20px;
-        }}
-        .tab-btn {{
-            flex: 1;
-            padding: 10px 20px;
-            border: none;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }}
-        .tab-btn.active {{
-            background: white;
-            color: #333;
-            font-weight: bold;
-        }}
-        .tab-content {{
-            display: none;
-        }}
-        .tab-content.active {{
-            display: block;
-        }}
-        @media (max-width: 768px) {{
-            .dashboard-container {{
-                padding: 10px;
-            }}
-            .charts-grid {{
-                grid-template-columns: 1fr;
-            }}
-            .stats-overview {{
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            }}
-        }}
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🎓 NTU分布式系统考试分析仪表板</h1>
-            <p>基于153个扩展题目的多维度专业分析报告</p>
-        </div>
-
-        <!-- Statistics Overview -->
-        <div class="stats-overview">
-            <div class="stat-card">
-                <div class="stat-number">{stats_data['total_questions']}</div>
-                <div class="stat-label">总题目数量</div>
-                <div class="stat-trend">扩展后题目</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{stats_data['unique_knowledge_points']}</div>
-                <div class="stat-label">知识点覆盖</div>
-                <div class="stat-trend">全面覆盖</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{stats_data['question_types_count']}</div>
-                <div class="stat-label">题型种类</div>
-                <div class="stat-trend">多样化</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{stats_data['chapters_covered']}</div>
-                <div class="stat-label">章节覆盖</div>
-                <div class="stat-trend">完整课程</div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="charts-grid">
-            <!-- Question Types Chart -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div class="chart-title">📊 题型分布分析</div>
-                </div>
-                <div class="chart-description">
-                    分析不同题型的分布情况，帮助了解考试重点题型
-                </div>
-                <div id="question-types-chart"></div>
-            </div>
-
-            <!-- Chapter Distribution -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div class="chart-title">📚 章节题目分布</div>
-                </div>
-                <div class="chart-description">
-                    各章节题目数量统计，识别重点章节
-                </div>
-                <div id="chapter-distribution-chart"></div>
-            </div>
-
-            <!-- Knowledge Points Analysis -->
-            <div class="chart-card full-width-chart">
-                <div class="chart-header">
-                    <div class="chart-title">🎯 知识点重要性分析</div>
-                </div>
-                <div class="chart-description">
-                    基于题目数量的知识点重要性排名
-                </div>
-                <div id="knowledge-points-chart"></div>
-            </div>
-
-            <!-- Difficulty Analysis -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div class="chart-title">📈 难度分析</div>
-                </div>
-                <div class="chart-description">
-                    基于题型和知识点复杂度的难度评估
-                </div>
-                <div id="difficulty-chart"></div>
-            </div>
-
-            <!-- Temporal Distribution -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div class="chart-title">⏰ 时间分布</div>
-                </div>
-                <div class="chart-description">
-                    题目在课程时间线上的分布
-                </div>
-                <div id="temporal-chart"></div>
-            </div>
-        </div>
-
-        <!-- Insights Section -->
-        <div class="insights-section">
-            <div class="insights-title">💡 关键洞察</div>
-            <div class="insights-grid">
-                <div class="insight-card">
-                    <div class="insight-title">🏆 重点章节</div>
-                    <div>{stats_data['top_chapter']}</div>
-                </div>
-                <div class="insight-card">
-                    <div class="insight-title">🎯 高频知识点</div>
-                    <div>{stats_data['top_knowledge_point']}</div>
-                </div>
-                <div class="insight-card">
-                    <div class="insight-title">📝 主要题型</div>
-                    <div>{stats_data['dominant_type']}</div>
-                </div>
-                <div class="insight-card">
-                    <div class="insight-title">📊 覆盖率</div>
-                    <div>{stats_data['coverage_rate']}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>© 2024 NTU分布式系统考试指南项目组 | 数据驱动的学习分析</p>
-        </div>
-    </div>
-
-    <script>
-        // 题型分布图表
-        const questionTypesData = {charts_data['question_types']};
-        Plotly.newPlot('question-types-chart', questionTypesData.data, questionTypesData.layout);
-
-        // 章节分布图表
-        const chapterData = {charts_data['chapter_distribution']};
-        Plotly.newPlot('chapter-distribution-chart', chapterData.data, chapterData.layout);
-
-        // 知识点分析图表
-        const knowledgeData = {charts_data['knowledge_points_analysis']};
-        Plotly.newPlot('knowledge-points-chart', knowledgeData.data, knowledgeData.layout);
-
-        // 难度分析图表
-        const difficultyData = {charts_data['difficulty_analysis']};
-        Plotly.newPlot('difficulty-chart', difficultyData.data, difficultyData.layout);
-
-        // 时间分布图表
-        const temporalData = {charts_data['temporal_distribution']};
-        Plotly.newPlot('temporal-chart', temporalData.data, temporalData.layout);
-    </script>
-</body>
-</html>
-"""
-
-        # 保存HTML文件
-        html_path = self.output_dir / 'comprehensive_dashboard.html'
-        with open(html_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
-
-        self.logger.info(f"综合分析网页已保存: {html_path}")
-        return str(html_path)
-    
     def analyze_question_types(self, df: pd.DataFrame) -> Dict[str, Any]:
         """分析题型分布"""
         type_counts = df['type'].value_counts()
@@ -1220,132 +889,8 @@ class ExamVisualizer:
         self.logger.info(f"知识点分析图已保存: {output_path}")
         return str(output_path)
     
-    def create_interactive_dashboard(self, df: pd.DataFrame) -> str:
-        """创建交互式仪表板"""
-        # 创建子图
-        fig = make_subplots(
-            rows=2, cols=2,
-            subplot_titles=('题型分布', '来源分布', '答案完整性', '题目复杂度'),
-            specs=[[{"type": "bar"}, {"type": "pie"}],
-                   [{"type": "bar"}, {"type": "scatter"}]]
-        )
-        
-        # 题型分布柱状图
-        type_counts = df['type'].value_counts()
-        fig.add_trace(
-            go.Bar(x=type_counts.index, y=type_counts.values,
-                   name="题型分布", marker_color=self.colors['primary']),
-            row=1, col=1
-        )
-        
-        # 来源分布饼图
-        source_counts = df['source'].value_counts()
-        fig.add_trace(
-            go.Pie(labels=source_counts.index, values=source_counts.values,
-                   name="来源分布"),
-            row=1, col=2
-        )
-        
-        # 题型分布
-        type_counts = df['type'].value_counts()
-        fig.add_trace(
-            go.Bar(x=type_counts.index, y=type_counts.values,
-                   name="题型分布", marker_color=self.colors['secondary']),
-            row=2, col=1
-        )
-        
-        # 题目长度分布散点图
-        fig.add_trace(
-            go.Scatter(x=df.index, y=df['title_length'],
-                      mode='markers', name="题目长度分布",
-                      text=df['type'], hovertemplate='<b>%{text}</b><br>题目长度: %{x}<br>答案长度: %{y}',
-                      marker=dict(color=df['title_length'], 
-                                colorscale='Viridis', size=8)),
-            row=2, col=2
-        )
-        
-        # 更新布局
-        fig.update_layout(
-            title_text="分布式系统考试题目分析仪表板",
-            showlegend=False,
-            height=800
-        )
-        
-        # 保存交互式图表
-        output_path = self.output_dir / 'interactive_dashboard.html'
-        fig.write_html(output_path)
-        
-        self.logger.info(f"交互式仪表板已保存: {output_path}")
-        return str(output_path)
-    
-    def generate_exam_insights(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """生成考试洞察报告"""
-        insights = {
-            'overview': {
-                'total_questions': len(df),
-                'total_sources': df['source'].nunique(),
-                'question_types': df['type'].nunique(),
-                'knowledge_coverage': len([kp for kp in df['knowledge_points'] 
-                                         if isinstance(kp, list) and kp and kp != ['Uncategorized']]) / len(df) * 100
-            },
-            'type_analysis': self.analyze_question_types(df),
-            'knowledge_analysis': self.analyze_knowledge_points(df),
-            'difficulty_analysis': {
-                'avg_title_length': df['title_length'].mean(),
-                'complex_questions': len(df[df['title_length'] > df['title_length'].quantile(0.75)])
-            },
-            'recommendations': self._generate_recommendations(df)
-        }
-        
-        return insights
-    
-    def _generate_recommendations(self, df: pd.DataFrame) -> List[str]:
-        """生成学习建议"""
-        recommendations = []
-        
-        # 基于题型分布的建议
-        type_counts = df['type'].value_counts()
-        most_common_type = type_counts.index[0]
-        recommendations.append(f"重点关注{most_common_type}，占比{type_counts.iloc[0]/len(df)*100:.1f}%")
-        
-        # 基于知识点的建议
-        all_kp = []
-        for kp_data in df['knowledge_points'].dropna():
-            if isinstance(kp_data, list):
-                # 列表格式
-                all_kp.extend([kp.strip() for kp in kp_data if kp.strip() and kp.strip() != 'Uncategorized'])
-            elif isinstance(kp_data, str) and kp_data != '未识别' and kp_data != 'Uncategorized':
-                # 字符串格式（向后兼容）
-                all_kp.extend([kp.strip() for kp in kp_data.split(';')])
-        
-        if all_kp:
-            kp_counter = Counter(all_kp)
-            top_kp = kp_counter.most_common(3)
-            recommendations.append(f"高频知识点：{', '.join([kp[0] for kp in top_kp])}")
-        
-        # 基于题目复杂度的建议
-        avg_length = df['title_length'].mean()
-        if avg_length > 500:
-            recommendations.append("题目普遍较长，建议加强理解能力训练")
-        
-        return recommendations
-    
-    def save_insights_report(self, insights: Dict[str, Any], output_path: str = None) -> str:
-        """保存洞察报告"""
-        if output_path is None:
-            output_path = self.output_dir / 'exam_insights_report.json'
-        
-        try:
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(insights, f, ensure_ascii=False, indent=2, default=str)
-            
-            self.logger.info(f"洞察报告已保存: {output_path}")
-            return str(output_path)
-            
-        except Exception as e:
-            self.logger.error(f"报告保存失败: {e}")
-            return ""
-    
+
+
     def generate_all_visualizations(self) -> Dict[str, str]:
         """生成所有专业可视化图表"""
         # 加载数据
@@ -1359,6 +904,9 @@ class ExamVisualizer:
         results = {}
 
         try:
+            # 导出CSV数据
+            results['questions_csv'] = self.export_to_csv()
+
             # 课程时间线
             results['curriculum_timeline'] = self.create_curriculum_timeline()
 
@@ -1371,10 +919,7 @@ class ExamVisualizer:
             # 章节重要性
             results['chapter_importance'] = self.create_chapter_importance_chart()
 
-            # 综合仪表板
-            results['comprehensive_dashboard'] = self.create_comprehensive_dashboard()
-
-            self.logger.info("所有专业可视化图表生成完成")
+            self.logger.info("所有可视化和数据导出完成")
             return results
 
         except Exception as e:
@@ -1386,222 +931,13 @@ class ExamVisualizer:
         
         return results
 
-    def _prepare_dashboard_stats(self) -> Dict[str, Any]:
-        """准备仪表板统计数据"""
-        # 计算基础统计
-        total_questions = len(self.extended_questions)
-        question_types = [q['type'] for q in self.extended_questions]
-        unique_types = set(question_types)
-        question_types_count = len(unique_types)
-
-        # 知识点统计
-        all_knowledge_points = []
-        for q in self.extended_questions:
-            if isinstance(q['knowledge_points'], list):
-                all_knowledge_points.extend(q['knowledge_points'])
-        unique_knowledge_points = len(set(all_knowledge_points))
-
-        # 章节统计
-        chapter_stats = defaultdict(int)
-        for q in self.extended_questions:
-            chapters = q['refer'].split(',')
-            for chapter in chapters:
-                chapter_stats[chapter.strip()] += 1
-        chapters_covered = len(chapter_stats)
-
-        # 找出重点章节和知识点
-        top_chapter = max(chapter_stats.items(), key=lambda x: x[1])[0] if chapter_stats else "N/A"
-        knowledge_point_counts = Counter(all_knowledge_points)
-        top_knowledge_point = knowledge_point_counts.most_common(1)[0][0] if knowledge_point_counts else "N/A"
-
-        # 主要题型
-        type_counts = Counter(question_types)
-        dominant_type = type_counts.most_common(1)[0][0] if type_counts else "N/A"
-
-        # 覆盖率计算
-        total_curriculum_kps = sum(len(chapter['content']) for chapter in self.curriculum_data['distributedSystemsCurriculum'])
-        coverage_rate = f"{unique_knowledge_points}/{total_curriculum_kps} ({unique_knowledge_points/total_curriculum_kps*100:.1f}%)"
-
-        return {
-            'total_questions': total_questions,
-            'unique_knowledge_points': unique_knowledge_points,
-            'question_types_count': question_types_count,
-            'chapters_covered': chapters_covered,
-            'top_chapter': top_chapter,
-            'top_knowledge_point': top_knowledge_point,
-            'dominant_type': dominant_type,
-            'coverage_rate': coverage_rate
-        }
-
-    def _create_question_types_chart_data(self) -> Dict[str, Any]:
-        """创建题型分布图表数据"""
-        type_counts = Counter(q['type'] for q in self.extended_questions)
-        types, counts = zip(*type_counts.items())
-
-        return {
-            'data': [{
-                'type': 'pie',
-                'labels': types,
-                'values': counts,
-                'marker': {
-                    'colors': self.colors['timeline'][:len(types)]
-                },
-                'textinfo': 'label+percent',
-                'hovertemplate': '<b>%{label}</b><br>数量: %{value}<br>占比: %{percent}<extra></extra>'
-            }],
-            'layout': {
-                'height': 400,
-                'margin': {'t': 0, 'b': 0, 'l': 0, 'r': 0}
-            }
-        }
-
-    def _create_chapter_distribution_data(self) -> Dict[str, Any]:
-        """创建章节分布图表数据"""
-        chapter_stats = defaultdict(int)
-        for q in self.extended_questions:
-            chapters = q['refer'].split(',')
-            for chapter in chapters:
-                chapter_stats[chapter.strip()] += 1
-
-        chapters, counts = zip(*sorted(chapter_stats.items(), key=lambda x: x[1], reverse=True))
-
-        return {
-            'data': [{
-                'type': 'bar',
-                'x': chapters,
-                'y': counts,
-                'marker': {
-                    'color': self.colors['timeline'][:len(chapters)]
-                },
-                'text': counts,
-                'textposition': 'auto',
-                'hovertemplate': '<b>%{x}</b><br>题目数量: %{y}<extra></extra>'
-            }],
-            'layout': {
-                'height': 400,
-                'xaxis': {'title': '章节'},
-                'yaxis': {'title': '题目数量'},
-                'margin': {'t': 20, 'b': 50, 'l': 50, 'r': 20}
-            }
-        }
-
-    def _create_knowledge_points_analysis_data(self) -> Dict[str, Any]:
-        """创建知识点分析图表数据"""
-        all_knowledge_points = []
-        for q in self.extended_questions:
-            if isinstance(q['knowledge_points'], list):
-                all_knowledge_points.extend(q['knowledge_points'])
-
-        kp_counts = Counter(all_knowledge_points)
-        kps, counts = zip(*kp_counts.most_common(20))  # Top 20
-
-        return {
-            'data': [{
-                'type': 'bar',
-                'x': counts,
-                'y': kps,
-                'orientation': 'h',
-                'marker': {
-                    'color': self.colors['primary']
-                },
-                'hovertemplate': '<b>%{y}</b><br>题目数量: %{x}<extra></extra>'
-            }],
-            'layout': {
-                'height': 600,
-                'xaxis': {'title': '题目数量'},
-                'yaxis': {'title': '知识点', 'autorange': 'reversed'},
-                'margin': {'t': 20, 'b': 50, 'l': 200, 'r': 20}
-            }
-        }
-
-    def _create_difficulty_analysis_data(self) -> Dict[str, Any]:
-        """创建难度分析图表数据"""
-        # 基于题型和知识点数量估算难度
-        difficulty_scores = []
-        for q in self.extended_questions:
-            score = 0
-            # 题型难度权重
-            type_weights = {
-                'Calculation': 3,
-                'Essay': 4,
-                'Programming': 5,
-                'Short Answer': 2,
-                'Fill in Blank': 1
-            }
-            score += type_weights.get(q['type'], 2)
-
-            # 知识点数量影响难度
-            if isinstance(q['knowledge_points'], list):
-                score += len(q['knowledge_points']) * 0.5
-
-            difficulty_scores.append(score)
-
-        # 难度分布
-        bins = [0, 2, 3, 4, 5, 10]
-        labels = ['简单', '中等', '稍难', '困难', '极难']
-        hist, bin_edges = np.histogram(difficulty_scores, bins=bins)
-
-        return {
-            'data': [{
-                'type': 'bar',
-                'x': labels,
-                'y': hist,
-                'marker': {
-                    'color': ['#2ca02c', '#ff7f0e', '#ff9896', '#d62728', '#9467bd']
-                },
-                'text': hist,
-                'textposition': 'auto',
-                'hovertemplate': '<b>%{x}</b><br>题目数量: %{y}<extra></extra>'
-            }],
-            'layout': {
-                'height': 400,
-                'xaxis': {'title': '难度等级'},
-                'yaxis': {'title': '题目数量'},
-                'margin': {'t': 20, 'b': 50, 'l': 50, 'r': 20}
-            }
-        }
-
-    def _create_temporal_distribution_data(self) -> Dict[str, Any]:
-        """创建时间分布图表数据"""
-        # 按章节统计题目分布
-        chapter_timeline = defaultdict(int)
-        for q in self.extended_questions:
-            chapters = q['refer'].split(',')
-            for chapter in chapters:
-                chapter_timeline[chapter.strip()] += 1
-
-        chapters, counts = zip(*sorted(chapter_timeline.items()))
-
-        return {
-            'data': [{
-                'type': 'scatter',
-                'mode': 'lines+markers',
-                'x': chapters,
-                'y': counts,
-                'line': {'color': self.colors['primary'], 'width': 3},
-                'marker': {'size': 8, 'color': self.colors['secondary']},
-                'hovertemplate': '<b>%{x}</b><br>题目数量: %{y}<extra></extra>'
-            }],
-            'layout': {
-                'height': 400,
-                'xaxis': {'title': '章节'},
-                'yaxis': {'title': '题目数量'},
-                'margin': {'t': 20, 'b': 50, 'l': 50, 'r': 20}
-            }
-        }
-
-    def _create_correlation_analysis_data(self) -> Dict[str, Any]:
-        """创建相关性分析数据"""
-        # 这里可以添加更复杂的相关性分析
-        return {}
-
 def main():
     """主函数 - 演示可视化功能"""
     visualizer = ExamVisualizer()
-    
+
     # 生成所有可视化
     results = visualizer.generate_all_visualizations()
-    
+
     print("\n=== 可视化分析完成 ===")
     for name, path in results.items():
         if path:

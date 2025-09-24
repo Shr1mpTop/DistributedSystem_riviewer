@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTU分布式系统考试分析平台</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- 加载状态 -->
+        <div v-if="loading" class="loading">
+            <div class="container">
+                <div class="header">
+                    <h1>🎓 NTU分布式系统考试分析平台</h1>
+                    <p>正在加载数据...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错误状态 -->
+        <div v-else-if="error" class="error">
+            <div class="container">
+                <div class="header">
+                    <h1>🎓 NTU分布式系统考试分析平台</h1>
+                    <p>数据加载失败</p>
+                </div>
+                <div style="color: red; text-align: center; padding: 50px;">
+                    <h2>数据加载失败</h2>
+                    <p>错误信息: {{ error }}</p>
+                    <p>请检查以下文件是否存在:</p>
+                    <ul>
+                        <li>../data/curriculum.json</li>
+                        <li>../output/extended_questions.json</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主应用内容 -->
+        <div v-else class="container">
+            <div class="header">
+                <h1>🎓 NTU分布式系统考试分析平台</h1>
+                <p>交互式题目分析与知识点导航系统</p>
+            </div>
+
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div v-for="stat in stats" :key="stat.label" class="stat-card">
+                        <div class="stat-number">{{ stat.number }}</div>
+                        <div class="stat-label">{{ stat.label }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-container">
+                <div class="timeline-title">📚 课程知识点时间线</div>
+                <div class="timeline-description">
+                    点击气泡查看对应知识点的详细题目信息
+                </div>
+                <div id="timeline"></div>
+            </div>
+
+            <!-- 新增可视化模块 -->
+            <div class="visualization-grid">
+                <div class="chart-container">
+                    <div class="chart-title">📊 题目类型分布</div>
+                    <div id="question-types-chart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">🔥 知识点热力图</div>
+                    <div id="knowledge-heatmap"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">📈 章节重要性分析</div>
+                    <div id="chapter-importance-chart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">📉 题目难度分布</div>
+                    <div id="difficulty-distribution-chart"></div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>© 2025 NTU分布式系统考试分析平台 | 数据驱动的学习分析</p>
+            </div>
+        </div>
+
+        <!-- 题目详情模态框 -->
+        <div v-if="showModal" class="question-modal" @click="closeModalOnOutsideClick">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">{{ modalTitle }}</div>
+                    <button class="close-btn" @click="closeModal">×</button>
+                </div>
+                <div id="modal-content">
+                    <div v-if="modalContent.length === 0" class="no-questions">
+                        此知识点暂无相关题目
+                    </div>
+                    <div v-else v-for="question in modalContent" :key="question.title" class="question-card">
+                        <span :class="`question-type type-${question.type.replace(/\s+/g, '')}`">{{ question.type
+                            }}</span>
+                        <div class="question-title">{{ question.title }}</div>
+                        <div class="question-meta">
+                            <strong>来源：</strong>{{ question.source }} | <strong>章节：</strong>{{ question.refer }}
+                        </div>
+                        <div v-if="question.knowledge_points && question.knowledge_points.length"
+                            class="knowledge-points">
+                            <strong>知识点：</strong>{{ question.knowledge_points.join('；') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
