@@ -1,19 +1,24 @@
 # 分布式系统考试指南项目
 
+## 📊 数据可视化预览
+
+### 章节重要性分析
+![章节重要性分析](output/visualizations/chapter_importance.png)
+
+### 课程时间线
+![课程时间线](output/visualizations/curriculum_timeline.png)
+
+### 知识点热力图
+![知识点热力图](output/visualizations/knowledge_points_heatmap.png)
+
+### 题型分布饼图
+![题型分布饼图](output/visualizations/question_types_pie.png)
+
 ## 📊 数据可视化展示
 
-### 章节重要程度分析
-![章节分布](output/visualizations/chapter_distribution_analysis.png)
+> 💡 **可视化功能**: 项目提供丰富的交互式数据可视化界面，可在浏览器中查看详细的分析结果。
 
-![章节重要程度分析](output/visualizations/chapter_importance_analysis.png)
-
-### 题型分布分析
-![题型分布](output/visualizations/question_type_distribution.png)
-
-### 知识点分析
-![知识点分析](output/visualizations/knowledge_points_analysis.png)
-
-> 📥 **下载完整数据**: [questions_full.csv](https://github.com/Shr1mpTop/DistributedSystem_riviewer/raw/main/output/questions_full.csv)
+> 📥 **下载完整数据**: [questions_full.csv](https://raw.githubusercontent.com/Shr1mpTop/DistributedSystem_riviewer/main/output/questions_full.csv) (右键另存为下载)
 
 ## 项目概述
 这是一个用于分析NTU分布式系统考试题目的项目，通过AI技术自动化提取和分析PDF中的考试题目。
