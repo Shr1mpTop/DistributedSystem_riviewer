@@ -10,7 +10,7 @@ async function initApp() {
 
         // Load curriculum data
         console.log('Loading curriculum data...');
-        const curriculumResponse = await fetch('../data/curriculum.json');
+        const curriculumResponse = await fetch('data/curriculum.json');
         if (!curriculumResponse.ok) {
             throw new Error(`Failed to load curriculum data: ${curriculumResponse.status}`);
         }
@@ -19,7 +19,7 @@ async function initApp() {
 
         // Load question data
         console.log('Loading question data...');
-        const questionsResponse = await fetch('../output/extended_questions.json');
+        const questionsResponse = await fetch('output/extended_questions.json');
         if (!questionsResponse.ok) {
             throw new Error(`Failed to load question data: ${questionsResponse.status}`);
         }
