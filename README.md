@@ -55,7 +55,13 @@
 ├── docs/                # GitHub Pages网站目录
 │   ├── index.html       # 主页面
 │   ├── styles.css       # 样式文件
-│   └── app.js          # 交互逻辑
+│   ├── app.js          # 交互逻辑
+│   ├── data/           # 网站数据目录
+│   │   └── curriculum.json  # 课程大纲数据
+│   └── output/         # 网站输出目录
+│       ├── extended_questions.json  # 题目数据
+│       ├── questions.csv    # 题目CSV
+│       └── visualizations/  # 可视化图表
 └── *.pdf               # 考试试卷PDF文件
 ```
 
