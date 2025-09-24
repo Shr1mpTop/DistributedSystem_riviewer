@@ -1,0 +1,70 @@
+{
+  "questions": [
+    {
+      "id": "Q001",
+      "title": "1. (a) In a distributed MRT information system, the server provides a method that allows the clients to query the fare between two specified stations. The server also provides an alert service to the clients through callback. When there is a service interruption for any MRT line, the alert service notifies interested clients of the line name. Assume that the station names and line names are represented by strings, and the fare is represented by a floating-point value.\n(i) Design a Java remote interface for the server to allow the clients to query the fares and to register their interests in the alert service. Design a Java remote interface for the clients to allow the server to perform callback. (6 marks)\n(ii) For each method defined in the above interfaces, briefly explain the parameter passing semantics of each parameter. (3 marks)\n(b) To resolve a name requested by a client C, four name servers are involved in the order of S1, S2, S3, S4. Suppose that only unicast is used in the name resolution. For each navigation type below, list the sequence of all messages sent among C, S1, S2, S3, S4 in the name resolution process (use the format “C → S₁” to indicate a message sent by C to S1).\n• Iterative client-controlled navigation\n• Non-recursive server-controlled navigation\n• Recursive server-controlled navigation (6 marks)",
+      "type": "Short Answer",
+      "refer": "Chapter 3 Distributed Objects & Remote Invocation, Chapter 6 Name Services",
+      "knowledge_points": [
+        "An example of Java RMI",
+        "Distributed object model",
+        "Domain Name System"
+      ],
+      "source": "3.pdf"
+    },
+    {
+      "id": "Q002",
+      "title": "2. In a peer-to-peer file sharing system based on Chord routing, the identifier circle ranges from 0 to 127 (i.e., 2^7 – 1). There are 10 nodes in the system: N2, N7, N27, N40, N47, N60, N69, N75, N90 and N96, where the numbers behind ‘N' denote the node identifiers on the identifier circle.\n(a) Draw the finger table of node N90. (3 marks)\n(b) What is the route of a query issued by node N90 for the location information of file K53 (the number behind 'K' denotes the key identifier of the file on the identifier circle)? (4 marks)\n(c) If a query issued by node N7 visits node N40 in its route, what are the possible key identifiers of the target file? (Note: The query may visit other nodes in addition to N40. N40 can be the node responsible for the target file or any other node visited in the query route.) (7 marks)",
+      "type": "Calculation",
+      "refer": "Chapter 5 Peer-to-Peer File Sharing Systems",
+      "knowledge_points": [
+        "Structured DHT Systems"
+      ],
+      "source": "3.pdf"
+    },
+    {
+      "id": "Q003",
+      "title": "3. Figure Q3 shows three computers A, B and M in an asynchronous distributed system, each having a local clock. M sends requests to the other two computers and then they reply to M. Events a to h represent the sending and receiving events of these messages. Let tx denote the local clock reading at event x in the computer where x occurs (for example, ta is the local clock reading of A at event a, and tc is the local clock reading of M at event c). Assume that M knows the time readings (in units of millisecond) of all events: ta = 200, tb = 220, tc = 110, td = 150, te = 180, tf= 190, tg = 30, and th = 60. The clock drifts at the computers are negligible. [Image of Figure Q3]\n(a) M would like to estimate the local clock reading of A. What is M's best estimate of A's clock reading at the time when M receives A's reply (i.e., at event f)? What is the accuracy of this estimate? (3 marks)\n(b) M would like to estimate the local clock reading of B. What is M's best estimate of B's clock reading at the time when M receives B's reply (i.e., at event e)? What is the accuracy of this estimate? (3 marks)\n(c) Suppose that M acts as the master in the Berkeley algorithm for synchronizing the local clocks of M, A and B. M does not eliminate any clock in its calculation. Following Q3(a) and Q3(b), what time value should M set its clock to when it receives A's reply (i.e., at event f)? What information should M send to A and B respectively for synchronizing their clocks? (5 marks)\n(d) Following Q3(c), after M, A and B perform synchronization using the Berkeley algorithm, what is the largest possible offset between A's clock and B's clock? (3 marks)\n(e) Assume that message delivery on each unidirectional point-to-point channel follows FIFO order. Suppose that M initiates the Chandy-and-Lamport algorithm sometime between events d and e to record a snapshot of the system. What are the possible snapshots finally recorded? In your answer, use SA, SB, and SM to represent the initial states of A, B, and M respectively, and use Sx to represent the state of the computer (where event x occurs) immediately after event x's occurrence (for example, Sa is the state of A immediately after event a occurs, and Sc is the state of M immediately after event c occurs). (4 marks)",
+      "type": "Calculation",
+      "refer": "Chapter 7 Time and Global States",
+      "knowledge_points": [
+        "Synchronizing Physical Clocks",
+        "Global States"
+      ],
+      "source": "3.pdf"
+    },
+    {
+      "id": "Q004",
+      "title": "4. Figure Q4 shows the execution of two processes p1 and p2 in an asynchronous distributed system, where the dots represent the events occurring in the processes, and the arrows represent the messages sent between the processes. Process p₁ contains a variable x, and process p2 contains a variable y. The values of x and y at different process states are shown in Figure Q4. [Image of Figure Q4]\n(a) Draw the lattice of consistent global states. In the lattice, use Sij to denote the global state after i events at process p₁ and j events at process p2. (7 marks)\n(b) If it can be inferred that the constraint |x - y| > 6 must be broken in the execution, what is the possible range of y's values in the two states shown by \"y = ?\" (note that these two states have the same y value)? (8 marks)",
+      "type": "Short Answer",
+      "refer": "Chapter 7 Time and Global States",
+      "knowledge_points": [
+        "Global States",
+        "Causal Ordering and Logical Clocks",
+        "Distributed Debugging"
+      ],
+      "source": "3.pdf"
+    },
+    {
+      "id": "Q005",
+      "title": "5. (a) We would like to modify the ring-based election algorithm to elect the process with the smallest identifier. Assume that each process has a unique identifier. Describe what a process with an identifier 6 needs to do when it receives an election message in each of the following cases:\n(i) The identifier in the received message is 5.\n(ii) The identifier in the received message is 6.\n(iii) The identifier in the received message is 7. (8 marks)\n(b) In the Ricart-and-Agrawala algorithm for mutual exclusion, instead of using logical clock readings to timestamp requests, suppose that every process timestamps its requests with its physical clock readings. Assume that the physical clocks always advance and do not fail. In the case that two requests have the same timestamps, the identifiers of the requesting processes are used to break ties (the process with smaller identifier is given higher priority). With this modification, does the algorithm still guarantee that at most one process may execute in the critical section at any time? Briefly explain your answer. (12 marks)",
+      "type": "Essay",
+      "refer": "Chapter 7 Time and Global States",
+      "knowledge_points": [
+        "Synchronizing Physical Clocks",
+        "Causal Ordering and Logical Clocks"
+      ],
+      "source": "3.pdf"
+    },
+    {
+      "id": "Q006",
+      "title": "6. Consider a replicated shared object service hosting an integer object x whose initial value is 0. Table Q6 shows the operations performed by two clients on x. For example, read(x) → a denotes a read operation on x returning a value a, and write(x ← x + 20) denotes a write operation increasing the value of x by 20. The operations of each client are listed in the order that they are performed by the client.\n\nTable Q6\nProgram order ↓\nClient A: write(x ← x + 100), read(x) → a, read(x) → b\nClient B: write(x ← x + 3), read(x) → c, write(x ← x + 20), read(x) → d\n\n(a) If a = 103 and the object service is sequentially consistent, what are the possible combinations of the values c and d? (3 marks)\n(b) If the object service is FIFO consistent, what are the possible combinations of the values c and d? (3 marks)\n(c) If b = 123 and the object service provides both monotonic-reads consistency and monotonic-writes consistency, what are the possible values of a ? (4 marks)\n(d) If the object service is read-your-writes consistent, what are the possible combinations of the values c and d? (4 marks)\n(e) If c = 103 and the object service is writes-follow-reads consistent, what are the possible values of d? (4 marks)",
+      "type": "Short Answer",
+      "refer": "Chapter 1 Characterization of Distributed Systems & System Models",
+      "knowledge_points": [
+        "Fundamental models"
+      ],
+      "source": "3.pdf"
+    }
+  ]
+}

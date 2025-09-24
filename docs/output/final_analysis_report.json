@@ -1,0 +1,119 @@
+{
+  "config": {
+    "project_name": "NTU分布式系统考试指南",
+    "version": "1.0.0",
+    "author": "分布式系统考试指南项目组",
+    "created_at": "2025-09-25T01:11:06.698496"
+  },
+  "analysis_date": "2025-09-25T01:17:25.388330",
+  "stages": {
+    "pdf_analysis": "completed",
+    "data_processing": "completed",
+    "visualization": "completed"
+  },
+  "statistics": {
+    "total_questions": 54,
+    "question_types": {
+      "Short Answer": 28,
+      "Calculation": 16,
+      "Programming": 4,
+      "Essay": 3,
+      "Fill in Blank": 3
+    },
+    "sources": {
+      "6.pdf": 8,
+      "5.pdf": 8,
+      "8.pdf": 8,
+      "3.pdf": 6,
+      "2.pdf": 6,
+      "7.pdf": 6,
+      "4.pdf": 6,
+      "1.pdf": 6
+    },
+    "avg_title_length": 1132.2407407407406,
+    "refers": {
+      "Chapter 7 Time and Global States": 20,
+      "Chapter 1 Characterization of Distributed Systems & System Models": 13,
+      "Chapter 3 Distributed Objects & Remote Invocation": 6,
+      "Chapter 5 Peer-to-Peer File Sharing Systems": 6,
+      "Chapter 4 Distributed File Systems": 5,
+      "Chapter 6 Name Services": 2,
+      "Chapter 3 Distributed Objects & Remote Invocation, Chapter 6 Name Services": 2
+    },
+    "knowledge_points_coverage": 1.0
+  },
+  "insights": {
+    "overview": {
+      "total_questions": 54,
+      "total_sources": 8,
+      "question_types": 5,
+      "knowledge_coverage": 0.0
+    },
+    "type_analysis": {
+      "counts": {
+        "Short Answer": 28,
+        "Calculation": 16,
+        "Programming": 4,
+        "Essay": 3,
+        "Fill in Blank": 3
+      },
+      "percentages": {
+        "Short Answer": 51.85185185185185,
+        "Calculation": 29.629629629629626,
+        "Programming": 7.4074074074074066,
+        "Essay": 5.555555555555555,
+        "Fill in Blank": 5.555555555555555
+      },
+      "total_types": 5,
+      "most_common": "Short Answer",
+      "least_common": "Fill in Blank"
+    },
+    "knowledge_analysis": {
+      "total_unique_points": 17,
+      "top_10_points": {
+        "['Fundamental models']": 13,
+        "['Structured DHT Systems']": 6,
+        "['Synchronizing Physical Clocks', 'Causal Ordering and Logical Clocks', 'Global States']": 6,
+        "['Sun Network File System', 'Andrew and Coda File Systems']": 5,
+        "['Causal Ordering and Logical Clocks']": 4,
+        "['Object-based model: remote method invocation (RMI)', 'An example of Java RMI']": 3,
+        "['Object-based model: remote method invocation (RMI)', 'An example of Java RMI', 'Architecture of RMI']": 2,
+        "['Domain Name System']": 2,
+        "['Synchronizing Physical Clocks', 'Global States']": 2,
+        "['Global States', 'Causal Ordering and Logical Clocks', 'Distributed Debugging']": 2
+      },
+      "total_mentions": 54,
+      "coverage_rate": 0.0
+    },
+    "difficulty_analysis": {
+      "avg_title_length": 1132.2407407407406,
+      "complex_questions": 14
+    },
+    "recommendations": [
+      "重点关注Short Answer，占比51.9%",
+      "高频知识点：['Fundamental models'], ['Structured DHT Systems'], ['Synchronizing Physical Clocks', 'Causal Ordering and Logical Clocks', 'Global States']",
+      "题目普遍较长，建议加强理解能力训练"
+    ]
+  },
+  "output_files": [
+    "output/parsed_questions.json",
+    "output/statistics.json",
+    "output/questions_full.csv",
+    "output/final_analysis_report.json",
+    "output/questions.csv",
+    "output/pdf_results/6_result.json",
+    "output/pdf_results/3_result.json",
+    "output/pdf_results/5_result.json",
+    "output/pdf_results/2_result.json",
+    "output/pdf_results/7_result.json",
+    "output/pdf_results/4_result.json",
+    "output/pdf_results/8_result.json",
+    "output/pdf_results/1_result.json",
+    "output/visualizations/interactive_dashboard.html",
+    "output/visualizations/question_type_distribution.png",
+    "output/visualizations/exam_insights_report.json",
+    "output/visualizations/chapter_importance_analysis.png",
+    "output/visualizations/knowledge_points_analysis.png",
+    "output/visualizations/chapter_distribution_analysis.png"
+  ]
+}

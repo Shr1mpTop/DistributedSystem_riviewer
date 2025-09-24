@@ -1,0 +1,77 @@
+{
+    "distributedSystemsCurriculum": [
+        {
+            "chapterNumber": "1",
+            "chapterTitle": "Characterization of Distributed Systems & System Models",
+            "content": [
+                "What is a Distributed System (DS)?",
+                "Fundamental characteristics of DS",
+                "Main motivation of DS – resource sharing (the Web example)",
+                "What are the issues and problems in DS?",
+                "Architecture models",
+                "Fundamental models",
+                "Summary"
+            ]
+        },
+        {
+            "chapterNumber": "2",
+            "chapterTitle": "Interprocess Communication",
+            "content": [
+                "External Data Representation & Marshalling",
+                "Client-Server Communication",
+                "Summary"
+            ]
+        },
+        {
+            "chapterNumber": "3",
+            "chapterTitle": "Distributed Objects & Remote Invocation",
+            "content": [
+                "Object-based model: remote method invocation (RMI)",
+                "Distributed object model",
+                "Architecture of RMI",
+                "An example of Java RMI",
+                "Summary"
+            ]
+        },
+        {
+            "chapterNumber": "4",
+            "chapterTitle": "Distributed File Systems",
+            "content": [
+                "Introduction",
+                "Sun Network File System",
+                "Andrew and Coda File Systems",
+                "Summary"
+            ]
+        },
+        {
+            "chapterNumber": "5",
+            "chapterTitle": "Peer-to-Peer File Sharing Systems",
+            "content": [
+                "Introduction",
+                "Unstructured P2P File Sharing",
+                "Structured DHT Systems",
+                "Summary"
+            ]
+        },
+        {
+            "chapterNumber": "6",
+            "chapterTitle": "Name Services",
+            "content": [
+                "Names and Name Services",
+                "Domain Name System",
+                "Summary"
+            ]
+        },
+        {
+            "chapterNumber": "7",
+            "chapterTitle": "Time and Global States",
+            "content": [
+                "Synchronizing Physical Clocks",
+                "Causal Ordering and Logical Clocks",
+                "Global States",
+                "Distributed Debugging",
+                "Summary"
+            ]
+        }
+    ]
+}

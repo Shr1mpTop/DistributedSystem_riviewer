@@ -1,0 +1,69 @@
+{
+  "questions": [
+    {
+      "id": "Q001",
+      "title": "1. (a) What are idempotent and non-idempotent operations? (3 marks)\n(b) A distributed contact tracing system maintains the records of lessons attended by students. The server provides three services. The first service is for the students to register attendance by specifying the location of a lesson (a string), the time of the lesson (two integers, day and hour), and the student name (a string). The second service is for the manager to retrieve all the lessons attended by a particular student by specifying the student name. The third service is for the manager to query the names of all the students attending a particular lesson by specifying the location and the time of the lesson. Design a Java remote interface for the server. (5 marks)",
+      "type": "Programming",
+      "refer": "Chapter 3 Distributed Objects & Remote Invocation",
+      "knowledge_points": [
+        "Object-based model: remote method invocation (RMI)",
+        "An example of Java RMI"
+      ],
+      "source": "1.pdf"
+    },
+    {
+      "id": "Q002",
+      "title": "2. (a) What is the purpose of mounting in a distributed file system? How is mounting carried out in the NFS? (6 marks)\n(b) A distributed file system consists of three computers: a server and two clients A and B. Let f be a single-block file stored at the server. Figure Q2 shows the operations performed by clients A and B on file f, where “o”, “r”, “u” and \"c\" represent open, read, update and close operations respectively. A and B both start with an empty client cache, and the caches are large enough to avoid any replacement. The updates made by B do not change the length of file f. The transmission delay in the network and the processing times at the computers are negligible.\n[Image of timeline showing operations for client A (o, r1 at 0s; r2 at 2s; r3 at 4s; r4 at 6s; r5,c at 8s; o,r6 at 9s; r7 at 11s; r8,c at 13s) and client B (o,u1 at 1s; u2 at 5s; u3,c at 9s) - Figure Q2]\nFor each of the following cases, determine which read operations of A return the file that incorporates the most recent update by B, and determine the time points when the file is transferred from the server to A.\n(i) The system is an NFS. The clients use a freshness interval of 3 seconds to maintain cache consistency, and client B uses a bio-daemon process to send its updates to the server right after making each update. (7 marks)\n(ii) The system is an AFS that implements session update semantics. (7 marks)",
+      "type": "Calculation",
+      "refer": "Chapter 4 Distributed File Systems",
+      "knowledge_points": [
+        "Sun Network File System",
+        "Andrew and Coda File Systems"
+      ],
+      "source": "1.pdf"
+    },
+    {
+      "id": "Q003",
+      "title": "3. Three processes p1, p2 and p3 are running on different computers in an asynchronous distributed system. Each process has a local clock. Figure Q3 shows four messages sent between the processes, where events a to h represent the sending and receiving events of these messages. Let te be the reading of p1's clock at event e, and tg be the reading of p2's clock at event g. Suppose that p3 knows te and tg, as well as the lengths of the time intervals measured by respective clocks as shown in the figure.\n[Image of process-time diagram for p1, p2, p3 with events a-h and time intervals. Message from p3(a) to p2(b). Message from p2(c) to p1(d). Message from p1(e) to p2(f). Message from p2(g) to p3(h). Time intervals: d to e is 400ms. c to f is 700ms. f to g is 30ms. a to h is 1000ms. a to c (on p3's clock) is 800ms - Figure Q3]\n(a) If p3 would like to synchronize its clock with p2's clock as accurately as possible, what time should p3 set its clock to when it receives the message at event h? What is the accuracy of this setting? (5 marks)\n(b) If p3 would like to synchronize its clock with p₁'s clock as accurately as possible, what time should p3 set its clock to at event h? What is the accuracy of this setting? (5 marks)\n(c) Timestamp all the events in Figure Q3 using the vector clocks. (6 marks)\n(d) Assume that message delivery on each unidirectional point-to-point channel follows FIFO order. p2 initiates the Chandy-and-Lamport algorithm sometime between events c and f to record a snapshot of the system. List all the possible snapshots finally recorded. Indicate clearly the process states and channel states in the snapshots. In your answer, if needed, use S1, S2 and S3 to represent the initial states of p1, p2 and p3 respectively, and use Sx to represent the state of the process where event x occurs immediately after event x's occurrence (for example, Sa is the state of p3 immediately after event a occurs, and Sc is the state of p2 immediately after event c occurs). (6 marks)",
+      "type": "Calculation",
+      "refer": "Chapter 7 Time and Global States",
+      "knowledge_points": [
+        "Synchronizing Physical Clocks",
+        "Causal Ordering and Logical Clocks",
+        "Global States"
+      ],
+      "source": "1.pdf"
+    },
+    {
+      "id": "Q004",
+      "title": "4. The vector clock mechanism is used to timestamp the events that occur in a distributed system of three processes p1, p2, p3. Suppose that in a consistent cut, the last event occurring in each process has the following timestamps:\np1: (300, 100, 100)\np2: (200, 200, 200)\np3: (300, a, b)\nWhat are the possible ranges of the values a and b respectively? Briefly explain your answer. (10 marks)",
+      "type": "Calculation",
+      "refer": "Chapter 7 Time and Global States",
+      "knowledge_points": [
+        "Causal Ordering and Logical Clocks",
+        "Global States"
+      ],
+      "source": "1.pdf"
+    },
+    {
+      "id": "Q005",
+      "title": "5. (a) Suppose that the Ricart and Agrawala algorithm is used for distributed mutual exclusion among n processes p1, p2, ..., pn. Below is the partial pseudocode of the algorithm executed by a process pi. Complete the algorithm by filling in the boxes A to F with appropriate pseudocode.\n\nOn initialization\n  state := RELEASED;\nTo enter the critical section\n  [Box A]\n  send request to all the other processes;\n  T := the timestamp of the request by the logical clock;\n  [Box B]\n  state := HELD;\nOn receipt of a request (Tj, pj) from another process pj (j ≠ i)\n  if (state = RELEASED or [Box C] );\n  then\n    [Box D]\n  else\n    [Box E]\n  end if\nTo exit the critical section\n  [Box F]\n  reply to all queued requests;\n\n(10 marks)\n(b) In the Ricart and Agrawala algorithm, suppose the statement \"T := the timestamp of the request by the logical clock\" is changed to “T := a random number\". Assume that different processes never generate the same random number. Does the algorithm still guarantee that at most one process may execute in the critical section at any time? Briefly explain your answer. (10 marks)",
+      "type": "Fill in Blank",
+      "refer": "Chapter 7 Time and Global States",
+      "knowledge_points": [
+        "Causal Ordering and Logical Clocks"
+      ],
+      "source": "1.pdf"
+    },
+    {
+      "id": "Q006",
+      "title": "6. Consider a replicated shared object service hosting an integer object x whose initial value is 0. Table Q6 shows the operations performed by two clients on x. For example, read(x) → a denotes a read operation on x returning a value a, and write(x ← x + 50) denotes a write operation increasing the value of x by 50. The operations of each client are listed in the order that they are performed by the client.\n[Table Q6]\nProgram order (down arrow)\nClient A:\nwrite(x ← x + 6)\nread(x) → a\nwrite(x ← x + 50)\nread(x) → b\nClient B:\nwrite(x ← x + 400)\nread(x) → c\nread(x) → 400\nread(x) → d\n[/Table Q6]\n(a) If the object service is sequentially consistent, what are the possible combinations of the values a and b? (4 marks)\n(b) If the object service is monotonic-read consistent, what are the possible combinations of the values c and d? (4 marks)\n(c) If the object service is both monotonic-read consistent and monotonic-write consistent, what are the possible combinations of the values c and d? (4 marks)\n(d) If the object service is read-your-writes consistent, what are the possible combinations of the values a and b? (4 marks)\n(e) If a = 406 and the object service is writes-follow-reads consistent, what are the possible values of b? (4 marks)",
+      "type": "Calculation",
+      "refer": "Chapter 1 Characterization of Distributed Systems & System Models",
+      "knowledge_points": [
+        "Fundamental models"
+      ],
+      "source": "1.pdf"
+    }
+  ]
+}

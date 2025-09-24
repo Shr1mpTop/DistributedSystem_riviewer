@@ -1,0 +1,31 @@
+{
+  "total_questions": 54,
+  "question_types": {
+    "Short Answer": 28,
+    "Calculation": 16,
+    "Programming": 4,
+    "Essay": 3,
+    "Fill in Blank": 3
+  },
+  "sources": {
+    "6.pdf": 8,
+    "5.pdf": 8,
+    "8.pdf": 8,
+    "3.pdf": 6,
+    "2.pdf": 6,
+    "7.pdf": 6,
+    "4.pdf": 6,
+    "1.pdf": 6
+  },
+  "avg_title_length": 1132.2407407407406,
+  "refers": {
+    "Chapter 7 Time and Global States": 20,
+    "Chapter 1 Characterization of Distributed Systems & System Models": 13,
+    "Chapter 3 Distributed Objects & Remote Invocation": 6,
+    "Chapter 5 Peer-to-Peer File Sharing Systems": 6,
+    "Chapter 4 Distributed File Systems": 5,
+    "Chapter 6 Name Services": 2,
+    "Chapter 3 Distributed Objects & Remote Invocation, Chapter 6 Name Services": 2
+  },
+  "knowledge_points_coverage": 1.0
+}
