@@ -23,3 +23,6 @@ asyncio
 # Logging and utilities
 tqdm
 colorama
+
+#visualization
+kaleido
