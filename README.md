@@ -2,7 +2,7 @@
 
 ### 🌐 在线演示
 
-> 🚀 **GitHub Pages**: [查看在线数据可视化]([https://shrimptop.github.io/DistributedSystem_riviewer/](https://shr1mptop.github.io/DistributedSystem_riviewer/))
+> 🚀 **GitHub Pages**: [查看在线数据可视化](https://shr1mptop.github.io/DistributedSystem_riviewer/)
 
 点击上方链接即可直接在浏览器中体验完整的交互式数据可视化界面，无需本地部署！
 
