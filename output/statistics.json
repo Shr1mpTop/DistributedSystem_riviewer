@@ -1,31 +1,31 @@
 {
-  "total_questions": 120,
+  "total_questions": 54,
   "question_types": {
-    "Calculation": 57,
-    "Short Answer": 44,
-    "Essay": 8,
-    "Programming": 7,
-    "Fill in Blank": 4
+    "Short Answer": 28,
+    "Calculation": 16,
+    "Programming": 4,
+    "Essay": 3,
+    "Fill in Blank": 3
   },
   "sources": {
-    "8.pdf": 20,
-    "7.pdf": 20,
-    "5.pdf": 20,
-    "3.pdf": 20,
-    "2.pdf": 16,
-    "1.pdf": 9,
     "6.pdf": 8,
-    "4.pdf": 7
+    "5.pdf": 8,
+    "8.pdf": 8,
+    "3.pdf": 6,
+    "2.pdf": 6,
+    "7.pdf": 6,
+    "4.pdf": 6,
+    "1.pdf": 6
   },
-  "avg_title_length": 650.625,
+  "avg_title_length": 1132.2407407407406,
   "refers": {
-    "Chapter 7 Time and Global States": 47,
-    "Chapter 1 Characterization of Distributed Systems & System Models": 37,
-    "Chapter 5 Peer-to-Peer File Sharing Systems": 11,
-    "Chapter 3 Distributed Objects & Remote Invocation": 10,
-    "Chapter 4 Distributed File Systems": 9,
-    "Chapter 6 Name Services": 4,
-    "Chapter 2 Interprocess Communication": 2
+    "Chapter 7 Time and Global States": 20,
+    "Chapter 1 Characterization of Distributed Systems & System Models": 13,
+    "Chapter 3 Distributed Objects & Remote Invocation": 6,
+    "Chapter 5 Peer-to-Peer File Sharing Systems": 6,
+    "Chapter 4 Distributed File Systems": 5,
+    "Chapter 6 Name Services": 2,
+    "Chapter 3 Distributed Objects & Remote Invocation, Chapter 6 Name Services": 2
   },
-  "knowledge_points_coverage": 0.975
+  "knowledge_points_coverage": 1.0
 }

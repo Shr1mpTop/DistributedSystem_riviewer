@@ -19,7 +19,7 @@ class DataProcessor:
         self.logger = logging.getLogger(__name__)
         
     def load_parsed_questions(self, json_path: str = "output/parsed_questions.json") -> List[Dict[str, Any]]:
-        """加载解析的题目JSON数据"""
+        """加载解析的题目JSON数据（兼容旧格式）"""
         try:
             with open(json_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -34,6 +34,44 @@ class DataProcessor:
         except json.JSONDecodeError as e:
             self.logger.error(f"JSON解析失败: {e}")
             return []
+    
+    def load_all_pdf_results(self, pdf_results_dir: str = "output/pdf_results") -> List[Dict[str, Any]]:
+        """加载所有PDF的解析结果并整合"""
+        results_dir = Path(pdf_results_dir)
+        if not results_dir.exists():
+            self.logger.error(f"PDF结果目录不存在: {pdf_results_dir}")
+            return []
+        
+        all_questions = []
+        json_files = list(results_dir.glob("*_result.json"))
+        
+        if not json_files:
+            self.logger.warning(f"在 {pdf_results_dir} 中未找到PDF结果文件")
+            return []
+        
+        self.logger.info(f"发现 {len(json_files)} 个PDF结果文件，开始整合...")
+        
+        for json_file in json_files:
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    pdf_result = json.load(f)
+                
+                questions = pdf_result.get('questions', [])
+                if questions:
+                    all_questions.extend(questions)
+                    self.logger.info(f"从 {json_file.name} 加载了 {len(questions)} 道题目")
+                else:
+                    self.logger.warning(f"{json_file.name} 中没有题目数据")
+                    
+            except Exception as e:
+                self.logger.error(f"加载 {json_file.name} 失败: {e}")
+        
+        # 为所有题目重新编号
+        for i, question in enumerate(all_questions, 1):
+            question['id'] = f"Q{i:03d}"
+        
+        self.logger.info(f"整合完成，共 {len(all_questions)} 道题目")
+        return all_questions
     
     def clean_text(self, text: str) -> str:
         """清理文本内容"""

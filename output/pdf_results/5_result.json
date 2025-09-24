@@ -1,0 +1,89 @@
+{
+  "questions": [
+    {
+      "id": "Q001",
+      "title": "1. (a) An information server maintains the COVID-19 situation reports of different countries and updates them daily. The server would like to keep interested clients informed of the latest report through callback. Design a Java remote interface for the clients to allow the server to perform callback, and a Java remote interface for the server to allow the clients to register and deregister their interests in the report of a specified country. Assume that the reports and country names are represented by strings.\n(b) A client makes remote method invocations to a server. The client takes 3 milliseconds to compute the arguments for each request, and the server takes 20 milliseconds to process each request. The local operating system processing time for each send or receive operation is 1 millisecond, and the network propagation time to transmit each request or reply message is 4 milliseconds. Marshalling or unmarshalling takes 1 millisecond per message. The server runs two threads on two processors, and the client runs two threads on a single processor. Assume that context-switching times are negligible. Calculate the time taken by the client to generate and return from two remote method invocation requests.",
+      "type": "Short Answer",
+      "refer": "Chapter 3 Distributed Objects & Remote Invocation",
+      "knowledge_points": [
+        "Object-based model: remote method invocation (RMI)",
+        "An example of Java RMI",
+        "Architecture of RMI"
+      ],
+      "source": "5.pdf"
+    },
+    {
+      "id": "Q002",
+      "title": "2. A client C in NTU would like to resolve a name “www.ox.ac.uk\". List the sequence of all messages sent among C and the relevant name servers in the name resolution process, assuming name mappings are not cached at non-authoritative name servers initially. In your answer, use the format \"NS(ddd)” to indicate the authoritative name server for the domain “ddd”, and use the format “C→ NS(ddd)” to indicate a message sent by C to NS(ddd).",
+      "type": "Short Answer",
+      "refer": "Chapter 6 Name Services",
+      "knowledge_points": [
+        "Domain Name System"
+      ],
+      "source": "5.pdf"
+    },
+    {
+      "id": "Q003",
+      "title": "3. A distributed file system consists of a server and two clients A and B. Let f be a single-block file stored at the server. Figure Q3 shows the operations performed by clients A and B on file f, where “o”, “r”, “u” and “c” represent open, read, update and close operations respectively. A and B both start with an empty client cache, and the caches are large enough to avoid any replacement. The updates made by B do not change the length of file f. The transmission delay in the network and the processing times at the server and clients are negligible.\n[The timeline in Figure Q3 shows Client A performs: O,r1 at t=1; r2 at t=2; r3 at t=4; r4 at t=6; r5,c at t=9; O,r6 at t=11; r7,c at t=12; O,r8,c at t=14. Client B performs: O,u1 at t=3; u2 at t=5; u3,c at t=13.]\nFor each case below, determine the time instants when A needs to contact the server, and determine which read operations of A return the up-to-date file.\n(a) The system is an NFS. The clients use a freshness interval of 3 seconds to maintain cache consistency, and client B uses a bio-daemon process to send its updates to the server right after making each update.\n(b) The system is an AFS that implements session update semantics.",
+      "type": "Short Answer",
+      "refer": "Chapter 4 Distributed File Systems",
+      "knowledge_points": [
+        "Sun Network File System",
+        "Andrew and Coda File Systems"
+      ],
+      "source": "5.pdf"
+    },
+    {
+      "id": "Q004",
+      "title": "4. In a peer-to-peer file sharing system based on Chord routing, the identifier circle ranges from 0 to 127 (i.e., 2^7 – 1). There are 9 nodes in the system: N1, N8, N21, N30, N36, N51, N91, N97 and N116, where the numbers behind ‘N' denote the node identifiers on the identifier circle.\n(a) What is the route of a query issued by node N51 for the location information of file K34 (the number behind ‘K' denotes the key identifier of the file on the identifier circle)?\n(b) When a new node joins the system, nodes N8 and N30 both need to update their finger tables. What are the possible node identifiers of this new node? (Note: besides N8 and N30, there may be other nodes which also need to update their finger tables due to the new node.)",
+      "type": "Short Answer",
+      "refer": "Chapter 5 Peer-to-Peer File Sharing Systems",
+      "knowledge_points": [
+        "Structured DHT Systems"
+      ],
+      "source": "5.pdf"
+    },
+    {
+      "id": "Q005",
+      "title": "5. Three processes p1, p2 and p3 are running on three different computers in an asynchronous distributed system. Figure Q5 shows the messages m1 to m4 sent between the processes, where events a to h represent the sending and receiving events of these messages.\n[Figure Q5 shows message m1 from p1(event a) to p3(event b); message m2 from p3(event c) to p2(event d); message m3 from p2(event e) to p3(event f); message m4 from p3(event g) to p1(event h).]\n(a) Suppose that the transmission delay of each message is at least 50 ms. Clock drifts are negligible. Let tx be the local clock reading at event x in the process where x occurs (for example, ta is the local clock reading of p1 at event a, and tb is the local clock reading of p3 at event b). Assume that p1 knows the clock readings te and tg, and also knows that th – ta = 1000 ms, tc - tb = 100 ms, tf - tc = 500 ms, tg – tf = 100 ms, te – td = 300 ms.\n(i) If p1 would like to synchronize its local clock with p3's clock as accurately as possible, what time should p1 set its clock to when it receives message m4 from p3? What is the accuracy of this setting?\n(ii) If p1 would like to synchronize its local clock with p2's clock as accurately as possible, what time should p1 set its clock to when it receives message m4 from p3? What is the accuracy of this setting?\n(b) Timestamp all the events in Figure Q5 using the vector clocks.\n(c) Assume that message delivery on each unidirectional point-to-point channel follows FIFO order. Process p3 initiates the Chandy-and-Lamport algorithm immediately after event c to record a snapshot of the system. List all the possible snapshots finally recorded. Indicate clearly the process states and channel states in the snapshots. In your answer, use S1, S2 and S3 to represent the initial states of processes p1, p2 and p3 respectively, and use Sx to represent the state of the process (where event x occurs) immediately after event x's occurrence (for example, Sa is the state of process p1 immediately after event a occurs, and Sb is the state of process p3 immediately after event b occurs).",
+      "type": "Short Answer",
+      "refer": "Chapter 7 Time and Global States",
+      "knowledge_points": [
+        "Synchronizing Physical Clocks",
+        "Causal Ordering and Logical Clocks",
+        "Global States"
+      ],
+      "source": "5.pdf"
+    },
+    {
+      "id": "Q006",
+      "title": "6. A replicated shared object service hosts an integer object x whose initial value is 0. Table Q6 shows the operations performed by two clients on x. For example, read(x) → a denotes a read operation on x returning a value a, and write(x, 2) denotes a write operation setting the value of x to 2. The operations performed by each client are listed in the order that they are performed by the client.\nTable Q6 shows Program order for Client A: write(x, 1), read(x) → a, write(x, 2), read(x) → b. Program order for Client B: write(x, 3), read(x) → 1, write(x, 4), read(x) → c.\n(a) If the object service is sequentially consistent, what are the possible combinations of the values a, b and c?\n(b) If the object service is FIFO consistent, what are the possible combinations of the values a and b?\n(c) Suppose that there are four replicas of object x.\n(i) What are the maximum numbers of crash failures and arbitrary failures that can be tolerated respectively under passive replication?\n(ii) What are the maximum numbers of crash failures and arbitrary failures that can be tolerated respectively under active replication?\n(iii) Let R be the minimum allowable number of replicas in a read quorum and W be the minimum allowable number of replicas in a write quorum. List all possible combinations of R and W permitted by Gifford's quorum consensus scheme to handle network partitions.",
+      "type": "Short Answer",
+      "refer": "Chapter 1 Characterization of Distributed Systems & System Models",
+      "knowledge_points": [
+        "Fundamental models"
+      ],
+      "source": "5.pdf"
+    },
+    {
+      "id": "Q007",
+      "title": "7. Three processes p1, p2 and p3 are running in an asynchronous distributed system. The vector clock mechanism is used to timestamp the events that occur in these processes, including the events of sending messages, receiving messages and the internal actions carried out by the processes. Suppose that two events a and b have timestamps (10, 20, 30) and (40, 50, 60) respectively.\n(a) What is the maximum possible number of events x in the system satisfying both a → x and x → b in causal ordering? Briefly explain your answer and draw a diagram to illustrate such a scenario.\n(b) What is the minimum possible number of events x in the system satisfying both a → x and x → b in causal ordering? Briefly explain your answer and draw a diagram to illustrate such a scenario.",
+      "type": "Short Answer",
+      "refer": "Chapter 7 Time and Global States",
+      "knowledge_points": [
+        "Causal Ordering and Logical Clocks"
+      ],
+      "source": "5.pdf"
+    },
+    {
+      "id": "Q008",
+      "title": "8. (a) In an asynchronous distributed system, two processes A and B are connected by a bidirectional communication channel. Each process wants to select and take one of two actions x and y. Assume that the processes suffer from crash failures, but the communication channel is reliable and does not fail. Can a protocol be devised for the two processes to agree upon the action to take? Briefly explain your answer.\n(b) In the Ricart-and-Agrawala algorithm for mutual exclusion, instead of using logical clock readings to timestamp requests, suppose that every process maintains a monotonically increasing counter to record how many requests it has made, and uses the counter readings to timestamp its requests. With this modification, does the algorithm still guarantee that at most one process may execute in the critical section at any time? Briefly explain your answer.",
+      "type": "Short Answer",
+      "refer": "Chapter 1 Characterization of Distributed Systems & System Models",
+      "knowledge_points": [
+        "Fundamental models"
+      ],
+      "source": "5.pdf"
+    }
+  ]
+}

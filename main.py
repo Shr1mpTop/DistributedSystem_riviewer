@@ -96,21 +96,22 @@ class DistributedSystemExamAnalyzer:
             return False
     
     async def run_pdf_analysis(self) -> bool:
-        """运行PDF分析阶段"""
+        """运行PDF分析阶段 - 每个PDF单独保存JSON"""
         self.logger.info("=== 开始PDF分析阶段 ===")
         
         try:
-            # 解析所有PDF文件
-            results = await self.pdf_parser.parse_all_pdfs()
+            # 解析所有PDF文件（每个PDF会自动保存自己的JSON）
+            results = await self.pdf_parser.parse_all_pdfs(concurrency=2)
             
-            # 保存解析结果
-            output_data = self.pdf_parser.save_results(results)
+            # 统计总题目数
+            total_questions = sum(len(result.get('questions', [])) for result in results)
             
-            if output_data['total_questions'] == 0:
+            if total_questions == 0:
                 self.logger.warning("未提取到任何题目，请检查PDF文件内容")
                 return False
             
-            self.logger.info(f"PDF分析完成，提取到 {output_data['total_questions']} 道题目")
+            self.logger.info(f"PDF分析完成，共处理 {len(results)} 个PDF文件，提取到 {total_questions} 道题目")
+            self.logger.info("每个PDF的结果已分别保存到 output/pdf_results/ 目录")
             return True
             
         except Exception as e:
@@ -118,15 +119,15 @@ class DistributedSystemExamAnalyzer:
             return False
     
     def run_data_processing(self) -> bool:
-        """运行数据处理阶段"""
+        """运行数据处理阶段 - 从多个PDF JSON文件整合数据"""
         self.logger.info("=== 开始数据处理阶段 ===")
         
         try:
-            # 加载解析的题目数据
-            questions = self.data_processor.load_parsed_questions()
+            # 加载所有PDF的解析结果并整合
+            questions = self.data_processor.load_all_pdf_results()
             
             if not questions:
-                self.logger.error("没有找到解析的题目数据")
+                self.logger.error("没有找到任何PDF解析结果")
                 return False
             
             # 处理数据
@@ -234,7 +235,7 @@ class DistributedSystemExamAnalyzer:
             
             print(f"📊 总题目数量: {stats['total_questions']}")
             print(f"📝 题型分布: {stats['question_types']}")
-            print(f"✅ 答案完整率: {stats['has_answer_ratio']:.2%}")
+            print(f"🎯 知识点覆盖率: {stats['knowledge_points_coverage']:.2%}")
             
         except FileNotFoundError:
             print("📊 统计信息未找到")

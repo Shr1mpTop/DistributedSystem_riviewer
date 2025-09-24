@@ -63,7 +63,7 @@ class PDFParser:
     def create_extraction_prompt(self) -> str:
         """Create extraction prompt in English for better Gemini performance"""
         curriculum_str = json.dumps(self.curriculum, ensure_ascii=False, indent=2)
-        
+
         prompt = f"""
 ## 🎯 CRITICAL INSTRUCTION - MUST FOLLOW EXACTLY 🎯
 
@@ -79,7 +79,7 @@ You are a top-tier exam question extraction expert. Your task is to extract exam
   "questions": [
     {{
       "id": "Q001",
-      "title": "Complete question description including all options (if multiple choice)",
+      "title": "Complete question description including all sub-questions (a), (b), (c) if they belong to the same main question",
       "type": "Multiple Choice|Fill in Blank|Short Answer|Essay|Calculation|True/False|Programming",
       "refer": "Corresponding course chapter name",
       "knowledge_points": ["specific knowledge point 1", "specific knowledge point 2", "specific knowledge point 3"]
@@ -90,10 +90,18 @@ You are a top-tier exam question extraction expert. Your task is to extract exam
 ### 📋 STRICT EXECUTION RULES:
 1. **MUST output valid JSON** - No non-JSON content is accepted
 2. **id format**: Q001, Q002, Q003... incrementally
-3. **title**: Include complete question content, for multiple choice include all options A, B, C, D
+3. **title**: Complete question description for each individual sub-question
 4. **type**: Must be one of: Multiple Choice, Fill in Blank, Short Answer, Essay, Calculation, True/False, Programming
 5. **refer**: Match to curriculum chapters based on question content, format like "Chapter 1 Characterization of Distributed Systems & System Models"
-6. **knowledge_points**: Must be array format, containing specific knowledge points related to this question, extracted from curriculum content array, include 1-3 most relevant knowledge points
+6. **knowledge_points**: Must be array format, containing specific knowledge points related to this question
+
+### 🎯 QUESTION IDENTIFICATION PATTERNS - CRITICAL FOR SUB-QUESTION EXTRACTION:
+- **SUB-QUESTION SEPARATION**: If you see questions with (a), (b), (c) sub-questions, EACH sub-question should be extracted as a SEPARATE question entry
+- **INDIVIDUAL EXTRACTION**: Extract (a), (b), (c), (d), etc. as separate, independent questions
+- **CONTEXT INCLUSION**: Include necessary context from the main question in each sub-question title
+- **COMPLETE SUB-QUESTION**: Each sub-question should be self-contained with full context
+- **NO DUPLICATES**: If you encounter the same question multiple times, extract it ONLY ONCE
+- **UNIQUE IDENTIFICATION**: Each question should have unique content - do not repeat identical questions
 
 ### 🎯 KNOWLEDGE POINT ANALYSIS RULES:
 - Carefully analyze question content and find matching knowledge points from curriculum content arrays
@@ -103,8 +111,17 @@ You are a top-tier exam question extraction expert. Your task is to extract exam
 
 ### 🎯 QUESTION IDENTIFICATION PATTERNS:
 - Look for numbering: 1., 2., (1), (2), Q1, Question 1, etc.
+- Look for sub-question markers: (a), (b), (c), (i), (ii), (iii), etc.
 - Identify question marks, choice options, fill-in blanks
 - Look for "Answer", "Solution", etc. keywords but DO NOT include answers in output
+- **CRITICAL**: Extract EACH sub-question (a), (b), (c) as a SEPARATE question entry
+
+### 🎯 SUB-QUESTION EXTRACTION EXAMPLES:
+- **Input**: "Three processes p1, p2 and p3... (a) What is... (b) Calculate... (c) Explain..."
+- **Output**: THREE separate questions:
+  - Question 1: "Three processes p1, p2 and p3... (a) What is..."
+  - Question 2: "Three processes p1, p2 and p3... (b) Calculate..."
+  - Question 3: "Three processes p1, p2 and p3... (c) Explain..."
 
 ### ⚡ OUTPUT REQUIREMENTS:
 - Output JSON directly, do not wrap in ```json``` code blocks
@@ -112,7 +129,7 @@ You are a top-tier exam question extraction expert. Your task is to extract exam
 - Ensure JSON format is completely correct and parseable
 - If no questions found, output: {{"questions": []}}
 
-Please carefully analyze this PDF document and extract all exam questions:"""
+Please carefully analyze this PDF document and extract all exam questions WITH proper sub-question separation:"""
         return prompt
     
     async def analyze_pdf_with_ai(self, pdf_path: str, pdf_name: str, max_retries: int = 3) -> Dict[str, Any]:
@@ -249,28 +266,51 @@ Please carefully analyze this PDF document and extract all exam questions:"""
         """解析单个PDF文件"""
         pdf_name = Path(pdf_path).name
         self.logger.info(f"开始处理: {pdf_name}")
-        
+
         # 检查PDF文件是否存在且大小合适
         pdf_file = Path(pdf_path)
         if not pdf_file.exists():
             self.logger.error(f"PDF文件不存在: {pdf_path}")
             return {'questions': []}
-        
+
         file_size_mb = pdf_file.stat().st_size / (1024 * 1024)
         if file_size_mb > 20:
             self.logger.warning(f"{pdf_name} 文件过大 ({file_size_mb:.1f}MB)，可能会处理失败")
-        
+
         # 使用AI直接分析PDF
         result = await self.analyze_pdf_with_ai(pdf_path, pdf_name)
-        
+
         # 为每个题目添加源文件信息
         for question in result.get('questions', []):
             question['source'] = pdf_name
-        
+
+        # 保存单个PDF的解析结果
+        self.save_single_pdf_result(result, pdf_name)
+
         return result
     
-    async def parse_all_pdfs(self, pdf_directory: str = ".") -> List[Dict[str, Any]]:
-        """串行解析所有PDF文件（避免API速率限制）"""
+    def save_single_pdf_result(self, result: Dict[str, Any], pdf_name: str):
+        """保存单个PDF的解析结果"""
+        try:
+            # 确保输出目录存在
+            output_dir = Path("output/pdf_results")
+            output_dir.mkdir(parents=True, exist_ok=True)
+            
+            # 生成输出文件名（移除.pdf扩展名）
+            base_name = pdf_name.replace('.pdf', '')
+            output_path = output_dir / f"{base_name}_result.json"
+            
+            # 保存结果
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+            
+            self.logger.info(f"单个PDF结果已保存: {output_path}")
+            
+        except Exception as e:
+            self.logger.error(f"保存单个PDF结果失败 {pdf_name}: {e}")
+    
+    async def parse_all_pdfs(self, pdf_directory: str = ".", concurrency: int = 2) -> List[Dict[str, Any]]:
+        """并发解析所有PDF文件（控制并发数避免API速率限制）"""
         pdf_files = list(Path(pdf_directory).glob("*.pdf"))
         
         if not pdf_files:
@@ -278,22 +318,45 @@ Please carefully analyze this PDF document and extract all exam questions:"""
             return []
         
         self.logger.info(f"发现 {len(pdf_files)} 个PDF文件")
-        self.logger.info("使用串行处理以避免API速率限制...")
+        self.logger.info(f"使用并发处理，并发数: {concurrency}")
         
-        results = []
+        # 创建信号量控制并发数
+        semaphore = asyncio.Semaphore(concurrency)
+        
+        async def parse_with_semaphore(pdf_file: Path) -> Dict[str, Any]:
+            """使用信号量控制的PDF解析函数"""
+            async with semaphore:
+                self.logger.info(f"开始处理: {pdf_file.name}")
+                result = await self.parse_single_pdf(str(pdf_file))
+                self.logger.info(f"完成处理: {pdf_file.name} ({len(result.get('questions', []))} 道题目)")
+                return result
+        
+        # 创建所有解析任务
+        tasks = [parse_with_semaphore(pdf_file) for pdf_file in pdf_files]
         
         # 使用进度条显示处理进度
         with tqdm(total=len(pdf_files), desc="解析PDF文件") as pbar:
-            for i, pdf_file in enumerate(pdf_files):
-                self.logger.info(f"处理第 {i+1}/{len(pdf_files)} 个文件: {pdf_file.name}")
+            # 分批执行任务，避免一次性创建太多任务
+            results = []
+            batch_size = concurrency * 2  # 批次大小为并发数的2倍
+            
+            for i in range(0, len(tasks), batch_size):
+                batch_tasks = tasks[i:i + batch_size]
+                batch_results = await asyncio.gather(*batch_tasks, return_exceptions=True)
                 
-                # 在每个文件之间添加短暂延迟
-                if i > 0:
-                    await asyncio.sleep(2)  # 2秒延迟以避免速率限制
+                # 处理结果
+                for result in batch_results:
+                    if isinstance(result, Exception):
+                        self.logger.error(f"PDF解析出现异常: {result}")
+                        results.append({'questions': []})  # 添加空结果
+                    else:
+                        results.append(result)
+                    
+                    pbar.update(1)
                 
-                result = await self.parse_single_pdf(str(pdf_file))
-                results.append(result)
-                pbar.update(1)
+                # 批次间添加短暂延迟，避免API过载
+                if i + batch_size < len(tasks):
+                    await asyncio.sleep(1)
         
         return results
     
